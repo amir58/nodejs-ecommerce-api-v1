@@ -1,6 +1,6 @@
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
-const CategoryModel = require("../models/categoryModel");
+const Category = require("../models/categoryModel");
 
 // @desc    Get list of categories
 // @route   GET /api/v1/categories
@@ -10,7 +10,7 @@ exports.getCategories = asyncHandler(async (req, res) => {
   var limit = req.query.limit * 1 || 3;
   var skip = (page - 1) * limit;
 
-  const categories = await CategoryModel.find({}).limit(limit).skip(skip);
+  const categories = await Category.find({}).limit(limit).skip(skip);
 
   res.status(200).json({ results: categories.length, page, data: categories });
   // res.send({ code: 200, message: "success", data: categories });
@@ -22,7 +22,29 @@ exports.getCategories = asyncHandler(async (req, res) => {
 exports.getCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const category = await CategoryModel.findById(id);
+  const category = await Category.findById(id);
+
+  if (!category) {
+    res.status(404).json({ msg: `Category not found` });
+  }
+
+  res.status(200).json({ data: category });
+});
+
+// @desc    Update category
+// @route   PUT /api/v1/categories/:id
+// @access  Private
+exports.updateCategory = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  const category = await Category.findOneAndUpdate(
+    { _id: id },
+    {
+      name,
+      slug: slugify(name),
+    },
+    { new: true }
+  );
 
   if (!category) {
     res.status(404).json({ msg: `Category not found` });
@@ -36,6 +58,6 @@ exports.getCategory = asyncHandler(async (req, res) => {
 // @access  Private
 exports.createCategory = asyncHandler(async (req, res) => {
   const name = req.body.name;
-  const category = await CategoryModel.create({ name, slug: slugify(name) });
+  const category = await Category.create({ name, slug: slugify(name) });
   res.status(201).json({ data: category });
 });
