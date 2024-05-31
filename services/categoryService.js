@@ -6,8 +6,13 @@ const CategoryModel = require("../models/categoryModel");
 // @route   GET /api/v1/categories
 // @access  Public
 exports.getCategories = asyncHandler(async (req, res) => {
-  const categories = await CategoryModel.find({});
-  res.status(200).json({ results: categories.length, data: categories });
+  var page = req.query.page * 1 || 1;
+  var limit = req.query.limit * 1 || 3;
+  var skip = (page - 1) * limit;
+
+  const categories = await CategoryModel.find({}).limit(limit).skip(skip);
+
+  res.status(200).json({ results: categories.length, page, data: categories });
   // res.send({ code: 200, message: "success", data: categories });
 });
 
