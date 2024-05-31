@@ -23,8 +23,17 @@ if (process.env.MODE_ENV === "development") {
 // Routes
 app.use("/api/v1/categories", categoryRoute);
 
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  res.status(500).json(err);
+});
+
 app.get("/", (req, res) => {
   res.send("Our, API V1 ✅");
+});
+
+app.get("/ping", (req, res) => {
+  res.send("🚀");
 });
 
 // app.get("/cities", (req, res) => {
