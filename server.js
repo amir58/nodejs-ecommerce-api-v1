@@ -23,9 +23,17 @@ if (process.env.MODE_ENV === "development") {
 // Routes
 app.use("/api/v1/categories", categoryRoute);
 
+app.all("*", (req, res, next) => {
+  // Create error and send it to error handling middleware
+  const error = new Error(`Cant find ${req.originalUrl} on this server`);
+  next(error.message);
+});
+
 // Global error handling middleware
 app.use((err, req, res, next) => {
-  res.status(500).json(err);
+  res.status(404).json({
+    message: err,
+  });
 });
 
 app.get("/", (req, res) => {
