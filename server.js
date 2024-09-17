@@ -52,6 +52,18 @@ app.get("/ping", (req, res) => {
 // });
 
 const PORT = process.env.PORT;
-app.listen(PORT, () => {
+
+const server = app.listen(PORT, () => {
   console.log(`App Running on port ${PORT}`);
+});
+
+// Events => List => calback(err)
+process.on("unhandledRejection", (err) => { 
+  console.error(err.name, err.message);
+
+  server.close(() => {
+    console.error("UNHANDLED REJECTION! 💥 Shutting down...");
+    process.exit(1);
+    // In porduction the server have tools to restart
+  });
 });

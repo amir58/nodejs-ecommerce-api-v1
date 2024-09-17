@@ -5,9 +5,6 @@ const dbConnection = () => {
     .connect(process.env.DB_URI)
     .then((con) => {
       console.log(`Database connected with ${mongoose.connections.host}`);
-    })
-    .catch((err) => {
-      console.log(err);
     });
 };
 
