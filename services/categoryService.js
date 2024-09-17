@@ -36,7 +36,7 @@ exports.getCategory = asyncHandler(async (req, res, next) => {
 // @desc    Update category
 // @route   PUT /api/v1/categories/:id
 // @access  Private
-exports.updateCategory = asyncHandler(async (req, , next) => {
+exports.updateCategory = asyncHandler(async (req, next) => {
   const { id } = req.params;
   const { name } = req.body;
   const category = await Category.findOneAndUpdate(
