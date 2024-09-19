@@ -13,10 +13,13 @@ const subCategorySchema = new mongose.Schema({
         lowerCase: true,
     },
     "category": {
-        type : mongose.Schema.ObjectId,
-        ref : 'Category',
-        required : [true, 'SubCategory must belong to a category']
+        type: mongose.Schema.ObjectId,
+        ref: 'Category',
+        required: [true, 'SubCategory must belong to a category']
     },
+
+
+
 },
     { timestamps: true }
 );
