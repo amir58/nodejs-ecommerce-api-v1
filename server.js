@@ -57,7 +57,7 @@ const server = app.listen(PORT, () => {
   console.log(`App Running on port ${PORT}`);
 });
 
-// Events => List => calback(err)
+// Handle unhandled promise rejections outside express
 process.on("unhandledRejection", (err) => { 
   console.error(err.name, err.message);
 

@@ -1,9 +1,7 @@
 const globalError = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
-
-  console.log(process.env.NODE_ENV);
-  console.log(process.env.NODE_ENV === "development");
+  
   if(process.env.NODE_ENV === "development"){
     sendErrorForDev(err, res);
   }
