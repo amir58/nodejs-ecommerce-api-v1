@@ -7,9 +7,9 @@ const ApiError = require("../utils/apiError");
 // @route   GET /api/v1/categories
 // @access  Public
 exports.getCategories = asyncHandler(async (req, res) => {
-  var page = req.query.page * 1 || 1;
-  var limit = req.query.limit * 1 || 3;
-  var skip = (page - 1) * limit;
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 3;
+  const skip = (page - 1) * limit;
 
   const categories = await Category.find({}).limit(limit).skip(skip);
 
@@ -36,7 +36,7 @@ exports.getCategory = asyncHandler(async (req, res, next) => {
 // @desc    Update category
 // @route   PUT /api/v1/categories/:id
 // @access  Private
-exports.updateCategory = asyncHandler(async (req, next) => {
+exports.updateCategory = asyncHandler(async (res,req, next) => {
   const { id } = req.params;
   const { name } = req.body;
   const category = await Category.findOneAndUpdate(
@@ -74,6 +74,7 @@ exports.deleteCategory = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/categories
 // @access  Private
 exports.createCategory = asyncHandler(async (req, res) => {
+  // eslint-disable-next-line prefer-destructuring
   const name = req.body.name;
   const category = await Category.create({ name, slug: slugify(name) });
   res.status(201).json({ data: category });

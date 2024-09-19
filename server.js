@@ -8,6 +8,7 @@ const ApiError = require("./utils/apiError");
 const globalError = require("./middlewares/errorMiddleware");
 const dbConnection = require("./config/database");
 const categoryRoute = require("./routes/categoryRoute");
+const subCategoryRoute = require("./routes/subCategoryRoute");
 
 // Connect with DB
 dbConnection();
@@ -24,6 +25,7 @@ if (process.env.MODE_ENV === "development") {
 
 // Routes
 app.use("/api/v1/categories", categoryRoute);
+app.use("/api/v1/subCategories", subCategoryRoute);
 
 // Run when call route not found
 app.all("*", (req, res, next) => {
@@ -51,7 +53,8 @@ app.get("/ping", (req, res) => {
 //   });
 // });
 
-const PORT = process.env.PORT;
+// const PORT = process.env.PORT;
+const {PORT} = process.env;
 
 const server = app.listen(PORT, () => {
   console.log(`App Running on port ${PORT}`);
