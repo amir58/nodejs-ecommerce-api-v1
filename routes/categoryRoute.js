@@ -1,5 +1,10 @@
 const express = require("express");
-const { param, validationResult } = require('express-validator');
+const {
+  getCategoryValidator,
+  createCategoryValidator,
+  updateCategoryValidator,
+  deleteCategoryValidator,
+} = require("../utils/validators/categoryValidators")
 
 const {
   getCategories,
@@ -11,23 +16,16 @@ const {
 
 const router = express.Router();
 
-router.route("/").get(getCategories).post(createCategory);
+router
+  .route("/")
+  .get(getCategories)
+  .post(createCategoryValidator, createCategory);
+
 router
   .route("/:id")
-  .get(
-    param('id').isMongoId().withMessage('Invalid ID'),
-    (req, res, next) => {
-      const result = validationResult(req);
-      console.log(result.isEmpty());
-      if (!result.isEmpty()) {
-        return res.status(400).json({ errors: result.array() });
-      }
-      next();
-    },
-    getCategory
-  )
-  .put(updateCategory)
-  .delete(deleteCategory);
+  .get(getCategoryValidator, getCategory)
+  .put(updateCategoryValidator, updateCategory)
+  .delete(deleteCategoryValidator, deleteCategory);
 
 // router.post("/", createCategory);
 // router.get("/", getCategories);
