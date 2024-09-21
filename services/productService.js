@@ -1,6 +1,6 @@
 const slugify = require( "slugify" );
 const asyncHandler = require( "express-async-handler" );
-const Product = require( "../models/productModel.js" );
+const Product = require( "../models/productModel" );
 const ApiError = require( "../utils/apiError" );
 
 // @desc    Create Product
