@@ -4,6 +4,11 @@ const ApiError = require( "../utils/apiError" );
 
 const SubCategory = require( "../models/subCategoryModel" );
 
+exports.setCategoryIdToBody = asyncHandler(async (req, res, next) =>{
+  if ( !req.body.category ) req.body.category = req.params.categoryId;
+  next();
+})
+
 // @desc    Create a new sub category
 // @route   POST /api/v1/subCategories
 // @access  Private
