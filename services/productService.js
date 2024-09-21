@@ -1,6 +1,6 @@
 const slugify = require( "slugify" );
 const asyncHandler = require( "express-async-handler" );
-const Product = require( "../models/productModel" );
+const Product = require( "../models/productModel.js" );
 const ApiError = require( "../utils/apiError" );
 
 // @desc    Create Product
@@ -48,8 +48,8 @@ exports.getProduct = asyncHandler( async ( req, res, next ) => {
 // @access  Private
 exports.updateProduct = asyncHandler( async ( req, res, next ) => {
   const { id } = req.params;
-  req.body.slug = slugify(req.body.title);
-  
+  req.body.slug = slugify( req.body.title );
+
   const product = await Product.findOneAndUpdate(
     { _id: id },
     req.body,
