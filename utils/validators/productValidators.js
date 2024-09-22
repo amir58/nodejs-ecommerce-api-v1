@@ -13,7 +13,7 @@ exports.createProductValidator = [
         .withMessage( 'Product name is required' )
         .isLength( { min: 3, } )
         .withMessage( 'Too short Product name' )
-        .isLength( { max: 32 } )
+        .isLength( { max: 64 } )
         .withMessage( 'Too long Product name' ),
 
     check( 'description' )
@@ -21,7 +21,7 @@ exports.createProductValidator = [
         .withMessage( 'Product description is required' )
         .isLength( { min: 20, } )
         .withMessage( 'Too short Product description' )
-        .isLength( { max: 300 } )
+        .isLength( { max: 600 } )
         .withMessage( 'Too long Product description' ),
 
     check( 'quantity' )
@@ -45,11 +45,13 @@ exports.createProductValidator = [
         .withMessage( 'Product price after discount must be a number' )
         .isLength( { max: 32 } )
         .withMessage( 'Too long Product price' )
-        .custom( ( value, { req } ) => {
-            if ( value < req.body.price ) {
-                throw new Error( 'Product price after discount must be greater than or equal to Product price' );
+        .custom( ( value, { req, } ) => {
+            if ( req.body.price <= value ) {
+                throw new Error( 'Product price after discount must be less than or equal to Product price' );
             }
-        } ),
+            return true;
+        } )
+    ,
 
     check( 'colors' )
         .optional()
