@@ -5,7 +5,6 @@ const validatorMiddleware = require( '../../middlewares/validatorMiddleware' );
 const Category = require( '../../models/categoryModel' );
 const SubCategory = require( '../../models/subCategoryModel' );
 const Brand = require( '../../models/brandModel' );
-const { exists } = require( '../../models/productModel' );
 
 exports.getProductValidator = [
     check( 'id' ).isMongoId().withMessage( 'Invalid Product id' ),
@@ -94,16 +93,36 @@ exports.createProductValidator = [
         .custom( ( subCategoriesIds ) =>
             SubCategory.find( { _id: { $exists: true, $in: subCategoriesIds } } )
                 .then( ( result ) => {
-                    console.log( result.length );
-                    console.log( result );
+
                     if (
-                        result.length < 1 ||
+                        // result.length < 1 ||
                         result.length !== subCategoriesIds.length
                     ) {
                         return Promise.reject( new Error( 'Some subCategories does not exist' ) );
                     }
                     return true;
-                } ) ),
+                } ) )
+        .custom( ( subCategoriesIds, { req } ) =>
+            SubCategory.find( { category: req.body.category } ).then( ( subCategories ) => {
+
+                const subCategoriesIdsInDB = [];
+                subCategories.forEach( ( subCategory ) => {
+                    subCategoriesIdsInDB.push( subCategory._id.toString() );
+                } );
+
+                console.log( subCategoriesIdsInDB );
+
+                const valid = subCategoriesIds.every( id => subCategoriesIdsInDB.includes( id ) );
+                console.log( valid );
+
+                if ( !valid ) {
+                    return Promise.reject( new Error( 'Some subCategories does not belong to this category' ) );
+                }
+                console.log( 'true' );
+                return true;
+            } )
+        )
+    ,
 
     check( 'brand' )
         .optional()
