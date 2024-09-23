@@ -2,6 +2,11 @@
 const { check } = require( 'express-validator' );
 const validatorMiddleware = require( '../../middlewares/validatorMiddleware' );
 
+const Category = require( '../../models/categoryModel' );
+const SubCategory = require( '../../models/subCategoryModel' );
+const Brand = require( '../../models/brandModel' );
+const { exists } = require( '../../models/productModel' );
+
 exports.getProductValidator = [
     check( 'id' ).isMongoId().withMessage( 'Invalid Product id' ),
     validatorMiddleware,
@@ -71,17 +76,44 @@ exports.createProductValidator = [
         .notEmpty()
         .withMessage( 'Product category is required' )
         .isMongoId()
-        .withMessage( 'Invalid category id' ),
+        .withMessage( 'Invalid category id' )
+        .custom( ( categoryId ) =>
+            Category.findById( categoryId ).then(
+                ( category ) => {
+                    if ( !category ) {
+                        return Promise.reject( new Error( `No category found with this id ${ categoryId }` ) );
+                    }
+                } ) ),
 
-    check( 'subCategory' )
+    check( 'subCategories' )
         .optional()
+        // .toArray()
+        // .withMessage( 'Product subCategories must be an array' )
         .isMongoId()
-        .withMessage( 'Invalid subCategory id' ),
+        .withMessage( 'Invalid subCategory id' )
+        .custom( ( subCategoriesIds ) =>
+            SubCategory.find( { _id: { $exists: true, $in: subCategoriesIds } } )
+                .then( ( result ) => {
+                    console.log( result.length );
+                    console.log( result );
+                    if (
+                        result.length < 1 ||
+                        result.length !== subCategoriesIds.length
+                    ) {
+                        return Promise.reject( new Error( 'Some subCategories does not exist' ) );
+                    }
+                    return true;
+                } ) ),
 
     check( 'brand' )
         .optional()
         .isMongoId()
-        .withMessage( 'Invalid brand id' ),
+        .withMessage( 'Invalid brand id' )
+        .custom( ( brandId ) => Brand.findById( brandId ).then( brand => {
+            if ( !brand ) {
+                return Promise.reject( new Error( `No brand found with this id ${ brandId }` ) );
+            }
+        } ) ),
 
     check( 'ratingsAverage' )
         .optional()
