@@ -19,7 +19,7 @@ exports.createProduct = asyncHandler( async ( req, res ) => {
 exports.getProducts = asyncHandler( async ( req, res ) => {
   // 1) Filtering
   const queryStringObject = { ...req.query };
-  const excludeFields = [ "sort", "page", "limit", "fields" ];
+  const excludeFields = [ "sort", "page", "limit", "fields", "keyword" ];
   excludeFields.forEach( field => delete queryStringObject[ field ] );
   // Apply filtering using [gte, gt, lte, lt]
   let queryStr = JSON.stringify( queryStringObject );
@@ -27,7 +27,7 @@ exports.getProducts = asyncHandler( async ( req, res ) => {
 
   // 2) Pagination
   const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 3;
+  const limit = req.query.limit * 1 || 20;
   const skip = ( page - 1 ) * limit;
 
   // Build query
@@ -51,6 +51,16 @@ exports.getProducts = asyncHandler( async ( req, res ) => {
   }
   else {
     mongooseQuery = mongooseQuery.select( "-__v" );
+  }
+
+  // 5) Search
+  if ( req.query.keyword ) {
+    const query = {};
+    query.$or = [
+      { title: { $regex: req.query.keyword, $options: "i" } },
+      { description: { $regex: req.query.keyword, $options: "i" } }
+    ];
+    mongooseQuery = mongooseQuery.find( query );
   }
 
   // Executing query
