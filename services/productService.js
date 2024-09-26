@@ -31,7 +31,7 @@ exports.getProducts = asyncHandler( async ( req, res ) => {
   const skip = ( page - 1 ) * limit;
 
   // Build query
-  const mongooseQuery = Product.find( JSON.parse( queryStr ) )
+  let mongooseQuery = Product.find( JSON.parse( queryStr ) )
     .limit( limit )
     .skip( skip )
     .populate( { path: "category", select: "name" } );
@@ -39,11 +39,21 @@ exports.getProducts = asyncHandler( async ( req, res ) => {
   // 3) Sorting
   if ( req.query.sort ) {
     const sortBy = req.query.sort.split( "," ).join( " " );
-    mongooseQuery.sort( sortBy );
+    mongooseQuery = mongooseQuery.sort( sortBy );
   } else {
-    mongooseQuery.sort( "-createdAt" );
+    mongooseQuery = mongooseQuery.sort( "-createdAt" );
   }
 
+  // 4) Field limiting
+  if ( req.query.fields ) {
+    const fields = req.query.fields.split( "," ).join( " " );
+    mongooseQuery = mongooseQuery.select( fields );
+  }
+  else {
+    mongooseQuery = mongooseQuery.select( "-__v" );
+  }
+
+  // Executing query
   const products = await mongooseQuery;
 
   res.status( 200 ).json( { results: products.length, page, data: products } );
