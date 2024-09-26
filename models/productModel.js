@@ -61,7 +61,7 @@ const productSchema = new mongoose.Schema(
             ref: "Brand",
             // required: [ true, "Product must belong to a brand" ],
         },
-        ratingAverages: {
+        ratingsAverage: {
             type: Number,
             min: [ 0, "Rating must be more than 0" ],
             max: [ 5, "Rating must be less than or equal to 5" ],

@@ -23,19 +23,26 @@ exports.getProducts = asyncHandler( async ( req, res ) => {
   excludeFields.forEach( field => delete queryStringObject[ field ] );
   // Apply filtering using [gte, gt, lte, lt]
   let queryStr = JSON.stringify( queryStringObject );
-  queryStr = queryStr.replace( /\b(gte|gt|lte|lt)\b/g, match => `$${match}` );
+  queryStr = queryStr.replace( /\b(gte|gt|lte|lt)\b/g, match => `$${ match }` );
 
   // 2) Pagination
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 3;
   const skip = ( page - 1 ) * limit;
 
-  const mongooseQuery = Product.find( JSON.parse( queryStr ))
+  // Build query
+  const mongooseQuery = Product.find( JSON.parse( queryStr ) )
     .limit( limit )
     .skip( skip )
     .populate( { path: "category", select: "name" } );
 
-    
+  // 3) Sorting
+  if ( req.query.sort ) {
+    const sortBy = req.query.sort.split( "," ).join( " " );
+    mongooseQuery.sort( sortBy );
+  } else {
+    mongooseQuery.sort( "-createdAt" );
+  }
 
   const products = await mongooseQuery;
 
