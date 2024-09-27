@@ -62,27 +62,7 @@ exports.getProduct = asyncHandler( async ( req, res, next ) => {
 // @desc    Update Product
 // @route   PUT /api/v1/products/:id
 // @access  Private
-exports.updateProduct = asyncHandler( async ( req, res, next ) => {
-  const { id } = req.params;
-
-  if ( req.body.title ) {
-    req.body.slug = slugify( req.body.title );
-  }
-
-  const product = await Product.findOneAndUpdate(
-    { _id: id },
-    req.body,
-    { new: true }
-  );
-
-  if ( !product ) {
-    // res.status(404).json({ msg: `Product not found` });
-    return next( new ApiError( `Product not found`, 404 ) );
-  }
-
-  res.status( 200 ).json( { data: product } );
-} );
-
+exports.updateProduct = factory.updateOne( Product );
 // @desc    Delete Product
 // @route   DELETE /api/v1/products/:id
 // @access  Private
