@@ -1,7 +1,5 @@
-const slugify = require( "slugify" );
 const asyncHandler = require( "express-async-handler" );
 const Product = require( "../models/productModel" );
-const ApiError = require( "../utils/apiError" );
 const ApiFetaures = require( "../utils/apiFeatures" );
 const factory = require( "./handlersFactory" );
 
@@ -41,20 +39,7 @@ exports.getProducts = asyncHandler( async ( req, res ) => {
 // @desc    Get specific Product
 // @route   GET /api/v1/products/:id
 // @access  Public
-exports.getProduct = asyncHandler( async ( req, res, next ) => {
-  const { id } = req.params;
-
-  const product = await Product.findById( id )
-    .populate( { path: "category", select: "name" } );
-
-  if ( !product ) {
-    // res.status(405).json({ msg: `Product not found` });
-    return next( new ApiError( `Product not found`, 404 ) );
-  }
-
-  res.status( 200 ).json( { data: product } );
-} );
-
+exports.getProduct = factory.getOne( Product );
 // @desc    Update Product
 // @route   PUT /api/v1/products/:id
 // @access  Private

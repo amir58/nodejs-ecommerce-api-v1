@@ -7,6 +7,17 @@ exports.createOne = ( Model ) => asyncHandler( async ( req, res ) => {
     res.status( 201 ).json( { data: document } );
 } );
 
+exports.getOne = ( Model ) => asyncHandler( async ( req, res, next ) => {
+    const document = await Model.findById( req.params.id );
+
+    if ( !document ) {
+        return next( new ApiError( `document not found`, 404 ) );
+    }
+
+    res.status( 200 ).json( { data: document } );
+} );
+
+
 exports.deleteOne = ( Model ) => asyncHandler( async ( req, res, next ) => {
     const { id } = req.params;
     const document = await Model.findByIdAndDelete( id );

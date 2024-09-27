@@ -1,6 +1,5 @@
 const asyncHandler = require( "express-async-handler" );
 const Brand = require( "../models/brandModel" );
-const ApiError = require( "../utils/apiError" );
 const ApiFetaures = require( "../utils/apiFeatures" );
 const factory = require( "./handlersFactory" );
 
@@ -39,19 +38,7 @@ exports.getBrands = asyncHandler( async ( req, res ) => {
 // @desc    Get specific Brand
 // @route   GET /api/v1/brands/:id
 // @access  Public
-exports.getBrand = asyncHandler( async ( req, res, next ) => {
-  const { id } = req.params;
-
-  const brand = await Brand.findById( id );
-
-  if ( !brand ) {
-    // res.status(405).json({ msg: `Brand not found` });
-    return next( new ApiError( `Brand not found`, 404 ) );
-  }
-
-  res.status( 200 ).json( { data: brand } );
-} );
-
+exports.getBrand = factory.getOne( Brand );
 // @desc    Update Brand
 // @route   PUT /api/v1/brands/:id
 // @access  Private

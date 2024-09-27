@@ -1,7 +1,5 @@
-const slugify = require( "slugify" );
 const asyncHandler = require( "express-async-handler" );
 const Category = require( "../models/categoryModel" );
-const ApiError = require( "../utils/apiError" );
 const ApiFetaures = require( "../utils/apiFeatures" );
 const factory = require( "./handlersFactory" );
 
@@ -36,18 +34,7 @@ exports.getCategories = asyncHandler( async ( req, res ) => {
 // @desc    Get specific category
 // @route   GET /api/v1/categories/:id
 // @access  Public
-exports.getCategory = asyncHandler( async ( req, res, next ) => {
-  const { id } = req.params;
-
-  const category = await Category.findById( id );
-
-  if ( !category ) {
-    // res.status(405).json({ msg: `Category not found` });
-    return next( new ApiError( `Category not found`, 404 ) );
-  }
-
-  res.status( 200 ).json( { data: category } );
-} );
+exports.getCategory = factory.getOne( Category );
 
 // @desc    Update category
 // @route   PUT /api/v1/categories/:id
