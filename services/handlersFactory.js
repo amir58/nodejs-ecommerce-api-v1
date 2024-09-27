@@ -2,6 +2,7 @@ const asyncHandler = require( "express-async-handler" );
 const ApiError = require( "../utils/apiError" );
 const ApiFetaures = require( "../utils/apiFeatures" );
 
+
 exports.createOne = ( Model ) => asyncHandler( async ( req, res ) => {
     const document = await Model.create( req.body );
     res.status( 201 ).json( { data: document } );
