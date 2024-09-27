@@ -83,17 +83,5 @@ exports.updateBrand = asyncHandler( async ( req, res, next ) => {
 // @desc    Delete Brand
 // @route   DELETE /api/v1/brands/:id
 // @access  Private
-
 exports.deleteBrand = factory.deleteOne( Brand );
-
-// exports.deleteBrand = asyncHandler( async ( req, res, next ) => {
-//   const { id } = req.params;
-//   const brand = await Brand.findByIdAndDelete( id );
-//   if ( !brand ) {
-//     // res.status(404).json({ msg: `Brand not found` });
-//     return next( new ApiError( `Brand not found`, 404 ) );
-//   }
-
-//   res.status( 200 ).json( { msg: `Brand deleted` } );
-// } );
 

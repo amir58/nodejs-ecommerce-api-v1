@@ -88,14 +88,3 @@ exports.updateProduct = asyncHandler( async ( req, res, next ) => {
 // @access  Private
 exports.deleteProduct = factory.deleteOne( Product );
 
-// exports.deleteProduct = asyncHandler( async ( req, res, next ) => {
-//   const { id } = req.params;
-//   const product = await Product.findByIdAndDelete( id );
-//   if ( !product ) {
-//     // res.status(404).json({ msg: `Product not found` });
-//     return next( new ApiError( `Product not found`, 404 ) );
-//   }
-
-//   res.status( 200 ).json( { msg: `Product deleted` } );
-// } );
-

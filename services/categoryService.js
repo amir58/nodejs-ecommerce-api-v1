@@ -80,13 +80,3 @@ exports.updateCategory = asyncHandler( async ( req, res, next ) => {
 // @route   DELETE /api/v1/categories/:id
 // @access  Private
 exports.deleteCategory = factory.deleteOne( Category );
-
-// exports.deleteCategory = asyncHandler( async ( req, res, next ) => {
-//   const { id } = req.params;
-//   const category = await Category.findByIdAndDelete( id );
-//   if ( !category ) {
-//     // res.status(404).json({ msg: `Category not found` });
-//     return next( new ApiError( `Category not found`, 404 ) );
-//   }
-//   res.status( 200 ).json( { msg: `Category deleted` } );
-// } );
