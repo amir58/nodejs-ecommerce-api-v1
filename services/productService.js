@@ -8,11 +8,7 @@ const factory = require( "./handlersFactory" );
 // @desc    Create Product
 // @route   POST /api/v1/products
 // @access  Private
-exports.createProduct = asyncHandler( async ( req, res ) => {
-  req.body.slug = slugify( req.body.title );
-  const product = await Product.create( req.body );
-  res.status( 201 ).json( { data: product } );
-} );
+exports.createProduct = factory.createOne( Product );
 
 
 // @desc    Get list of products

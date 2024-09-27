@@ -8,11 +8,7 @@ const factory = require( "./handlersFactory" );
 // @desc    Create category
 // @route   POST /api/v1/categories
 // @access  Private
-exports.createCategory = asyncHandler( async ( req, res ) => {
-  const { name } = req.body;
-  const category = await Category.create( { name, slug: slugify( name ) } );
-  res.status( 201 ).json( { data: category } );
-} );
+exports.createCategory = factory.createOne( Category );
 
 
 // @desc    Get list of categories

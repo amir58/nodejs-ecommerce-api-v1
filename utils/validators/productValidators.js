@@ -19,7 +19,11 @@ exports.createProductValidator = [
         .isLength( { min: 3, } )
         .withMessage( 'Too short Product name' )
         .isLength( { max: 64 } )
-        .withMessage( 'Too long Product name' ),
+        .withMessage( 'Too long Product name' )
+        .custom( ( value, { req } ) => {
+            req.body.slug = slugify( value );
+            return true;
+        } ),
 
     check( 'description' )
         .notEmpty()
