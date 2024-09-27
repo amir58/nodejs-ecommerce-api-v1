@@ -1,11 +1,19 @@
 const asyncHandler = require( "express-async-handler" );
-const ApiFetaures = require( "../utils/apiFeatures" );
 const factory = require( "./handlersFactory" );
 
 const SubCategory = require( "../models/subCategoryModel" );
 
+// Nested route : category
 exports.setCategoryIdToBody = asyncHandler( async ( req, res, next ) => {
   if ( !req.body.category ) req.body.category = req.params.categoryId;
+  next();
+} )
+
+// Nested route : filter object
+exports.createFilterObject = asyncHandler( async ( req, res, next ) => {
+  let filterObject = {};
+  if ( req.params.categoryId ) filterObject = { category: req.params.categoryId };
+  req.filterObject = filterObject;
   next();
 } )
 
@@ -14,37 +22,10 @@ exports.setCategoryIdToBody = asyncHandler( async ( req, res, next ) => {
 // @access  Private
 exports.createSubCategory = factory.createOne( SubCategory );
 
-exports.createFilterObject = asyncHandler( async ( req, res, next ) => {
-  let filterObject = {};
-  if ( req.params.categoryId ) filterObject = { category: req.params.categoryId };
-  req.filterObject = filterObject;
-  next();
-} )
-
 // @desc    Get list of subcategories
 // @route   GET /api/v1/subcategories
 // @access  Public
-exports.getSubCategories = asyncHandler( async ( req, res ) => {
-  const countDocuments = await SubCategory.countDocuments();
-
-  const apiFeatures = new ApiFetaures( SubCategory.find(), req.query );
-
-  apiFeatures
-    .paginate( countDocuments )
-    .filter()
-    .sort()
-    .limitFields()
-    .search();
-
-  const { mongooseQuery, pagingResults } = apiFeatures;
-  const subCategories = await mongooseQuery;
-
-  // .populate( { path: "category", select: "name -_id" } );
-  // .populate( { path: "category", select: "name" } );
-
-  res.status( 200 ).json( { results: subCategories.length, pagingResults, data: subCategories } );
-  // res.send({ code: 200, message: "success", data: categories });
-} );
+exports.getSubCategories = factory.getAll( SubCategory );
 
 // @desc    Get specific SubCategory
 // @route   GET /api/v1/categories/:id

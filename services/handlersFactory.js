@@ -1,10 +1,38 @@
 const asyncHandler = require( "express-async-handler" );
 const ApiError = require( "../utils/apiError" );
-// const ApiFetaures = require( "../utils/apiFeatures" );
+const ApiFetaures = require( "../utils/apiFeatures" );
 
 exports.createOne = ( Model ) => asyncHandler( async ( req, res ) => {
     const document = await Model.create( req.body );
     res.status( 201 ).json( { data: document } );
+} );
+
+exports.getAll = ( Model, modelName = '' ) => asyncHandler( async ( req, res ) => {
+    let filter = {};
+    console.log( req.filterObject );
+    if ( req.filterObject ) {
+        filter = req.filterObject;
+    }
+
+    const countDocuments = await Model.countDocuments();
+
+    const apiFeatures = new ApiFetaures( Model.find( filter ), req.query );
+
+    apiFeatures
+        .paginate( countDocuments )
+        .filter()
+        .sort()
+        .limitFields()
+        .search( modelName );
+
+    const { mongooseQuery, pagingResults } = apiFeatures;
+    const documents = await mongooseQuery;
+
+    res.status( 200 ).json( {
+        results: documents.length,
+        pagingResults,
+        data: documents,
+    } );
 } );
 
 exports.getOne = ( Model ) => asyncHandler( async ( req, res, next ) => {

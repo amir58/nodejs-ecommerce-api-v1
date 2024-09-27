@@ -1,6 +1,4 @@
-const asyncHandler = require( "express-async-handler" );
 const Category = require( "../models/categoryModel" );
-const ApiFetaures = require( "../utils/apiFeatures" );
 const factory = require( "./handlersFactory" );
 
 // @desc    Create category
@@ -12,24 +10,7 @@ exports.createCategory = factory.createOne( Category );
 // @desc    Get list of categories
 // @route   GET /api/v1/categories
 // @access  Public
-exports.getCategories = asyncHandler( async ( req, res ) => {
-  const countDocuments = await Category.countDocuments();
-
-  const apiFeatures = new ApiFetaures( Category.find(), req.query );
-
-  apiFeatures
-    .paginate( countDocuments )
-    .filter()
-    .sort()
-    .limitFields()
-    .search();
-
-  const { mongooseQuery, pagingResults } = apiFeatures;
-  const categories = await mongooseQuery;
-
-  res.status( 200 ).json( { results: categories.length, pagingResults, data: categories } );
-  // res.send({ code: 200, message: "success", data: categories });
-} );
+exports.getCategories = factory.getAll( Category )
 
 // @desc    Get specific category
 // @route   GET /api/v1/categories/:id
