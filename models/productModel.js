@@ -90,6 +90,7 @@ const setImageURL = ( doc ) => {
     }
 
     if ( doc.images ) {
+        // eslint-disable-next-line array-callback-return
         doc.images.map( ( image, index ) => {
             const imageUrl = `${ process.env.BASE_URL }/products/${ doc.images[ index ] }`;
             doc.images[ index ] = imageUrl;
