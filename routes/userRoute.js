@@ -12,6 +12,7 @@ const {
     getUser,
     createUser,
     updateUser,
+    changeUserPassword,
     deleteUser,
     uploadUserImage,
     resizeImage,
@@ -37,6 +38,13 @@ router
     .delete(
         deleteUserValidator,
         deleteUser
+    );
+
+router
+    .route( '/changePassword/:id' )
+    .put(
+        // updateUserValidator,
+        changeUserPassword
     );
 
 module.exports = router;

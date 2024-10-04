@@ -1,6 +1,7 @@
 const asyncHandler = require( 'express-async-handler' );
 const { v4: uuidv4 } = require( 'uuid' );
 const sharp = require( 'sharp' );
+const bcrypt = require( 'bcryptjs' );
 const ApiError = require( '../utils/apiError' )
 const factory = require( './handlersFactory' );
 const { uploadSingleImage } = require( '../middlewares/uploadImageMiddleware' );
@@ -44,8 +45,47 @@ exports.createUser = factory.createOne( User );
 
 // @desc    Update specific user
 // @route   PUT /api/v1/users/:id
-// @access  Private/Admin
-exports.updateUser = factory.updateOne( User );
+// @access  Private/User
+exports.updateUser = asyncHandler( async ( req, res, next ) => {
+    const document = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            name: req.body.name,
+            email: req.body.email,
+            phone: req.body.phone,
+            profileImg: req.body.profileImg,
+            role: req.body.role
+        },
+        { new: true }
+    );
+
+    if ( !document ) {
+        // res.status(404).json({ msg: `document not found` });
+        return next( new ApiError( `document not found`, 404 ) );
+    }
+
+    res.status( 200 ).json( { data: document } );
+} );
+
+// @desc    Update user password
+// @route   PUT /api/v1/users/:id
+// @access  Private/User
+exports.changeUserPassword = asyncHandler( async ( req, res, next ) => {
+    const document = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            password: await bcrypt.hash( req.body.password, 12 )
+        },
+        { new: true }
+    );
+
+    if ( !document ) {
+        // res.status(404).json({ msg: `document not found` });
+        return next( new ApiError( `document not found`, 404 ) );
+    }
+
+    res.status( 200 ).json( { data: document } );
+} );
 
 // @desc    Delete specific user
 // @route   DELETE /api/v1/users/:id
