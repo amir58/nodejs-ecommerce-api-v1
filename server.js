@@ -30,6 +30,8 @@ if ( process.env.MODE_ENV === "development" ) {
 }
 
 // Routes
+app.get( "/", ( req, res ) => { res.send( "Our, API V1 ✅" ); } );
+app.get( "/ping", ( req, res ) => { res.send( "🚀" ); } );
 app.use( "/api/v1/categories", categoryRoute );
 app.use( "/api/v1/subCategories", subCategoryRoute );
 app.use( "/api/v1/brands", brandRoute );
@@ -44,14 +46,6 @@ app.all( "*", ( req, res, next ) => {
 
 // Global error handling middleware
 app.use( globalError );
-
-app.get( "/", ( req, res ) => {
-  res.send( "Our, API V1 ✅" );
-} );
-
-app.get( "/ping", ( req, res ) => {
-  res.send( "🚀" );
-} );
 
 // app.get("/cities", (req, res) => {
 //   res.send({
