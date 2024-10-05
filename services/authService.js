@@ -67,6 +67,7 @@ exports.login = asyncHandler( async ( req, res, next ) => {
 // @route   POST  /api/v1/auth/login
 // @access  Public
 exports.protect = asyncHandler( async ( req, res, next ) => {
+    // 1) Check token if it exists
     let token;
     if ( req.headers.authorization && req.headers.authorization.startsWith( 'Bearer' ) ) {
         token = req.headers.authorization.split( ' ' )[ 1 ];
@@ -76,6 +77,14 @@ exports.protect = asyncHandler( async ( req, res, next ) => {
     if ( !token ) {
         return next( new ApiError( `Not authorized to access this route`, 401 ) );
     }
+
+    // 2) Verify token ( no changes happen , expiration time )
+    const decoded = jwt.verify( token, process.env.JWT_SECRET_KEY );
+    console.log( decoded );
+    // 3) Check if user still exists
+
+
+    // 4) Check if user changed password after the token was craeted
 
 } );
 
