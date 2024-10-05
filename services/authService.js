@@ -19,7 +19,7 @@ exports.signup = asyncHandler( async ( req, res ) => {
     } );
 
     const token = jwt.sign(
-        { id: document._id },
+        { userId: document._id },
         process.env.JWT_SECRET_KEY,
         {
             expiresIn: process.env.JWT_EXPIRE_TIME
@@ -48,7 +48,7 @@ exports.login = asyncHandler( async ( req, res, next ) => {
     }
 
     const token = jwt.sign(
-        { id: user._id },
+        { userId: user._id },
         process.env.JWT_SECRET_KEY,
         {
             expiresIn: process.env.JWT_EXPIRE_TIME
@@ -83,8 +83,12 @@ exports.protect = asyncHandler( async ( req, res, next ) => {
     console.log( decoded );
     // 3) Check if user still exists
 
+    const user = await User.findById( decoded.userId );
+    if ( !user ) {
+        return next( new ApiError( `The user belonging to this token does no longer exist`, 401 ) );
+    }
 
     // 4) Check if user changed password after the token was craeted
-
+    next();
 } );
 
