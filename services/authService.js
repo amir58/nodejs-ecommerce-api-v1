@@ -98,6 +98,10 @@ exports.protect = asyncHandler( async ( req, res, next ) => {
         }
     }
 
+    // 5) By Amir => Check is user active or not
+    if ( !user.active ) {
+        return next( new ApiError( `User with this email is not active`, 401 ) );
+    }
 
     next();
 } );
