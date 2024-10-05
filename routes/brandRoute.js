@@ -1,5 +1,7 @@
 const express = require( "express" );
 
+const { protect } = require( "../services/authService" );
+
 const {
   getBrandValidator,
   createBrandValidator,
@@ -23,6 +25,7 @@ router
   .route( "/" )
   .get( getBrands )
   .post(
+    protect,
     uploadBrandImage,
     resizeImage,
     createBrandValidator,
