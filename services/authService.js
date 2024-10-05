@@ -70,7 +70,6 @@ exports.protect = asyncHandler( async ( req, res, next ) => {
     let token;
     if ( req.headers.authorization && req.headers.authorization.startsWith( 'Bearer' ) ) {
         token = req.headers.authorization.split( ' ' )[ 1 ];
-        console.log( token );
     }
 
     if ( !token ) {
@@ -79,7 +78,6 @@ exports.protect = asyncHandler( async ( req, res, next ) => {
 
     // 2) Verify token ( no changes happen , expiration time )
     const decoded = jwt.verify( token, process.env.JWT_SECRET_KEY );
-    console.log( decoded );
     // 3) Check if user still exists
 
     const user = await User.findById( decoded.userId );
@@ -101,9 +99,18 @@ exports.protect = asyncHandler( async ( req, res, next ) => {
     if ( !user.active ) {
         return next( new ApiError( `User with this email is not active`, 401 ) );
     }
-    
+
     req.user = user
 
     next();
 } );
+
+exports.allowTo = ( ...roles ) => asyncHandler( ( req, res, next ) => {
+    console.log( req.user.role );
+    if ( !roles.includes( req.user.role ) ) {
+        return next( new ApiError( `You don't have permission to perform this action`, 403 ) );
+    }
+    next();
+}
+);
 
