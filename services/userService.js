@@ -1,5 +1,6 @@
 const asyncHandler = require( 'express-async-handler' );
 const { v4: uuidv4 } = require( 'uuid' );
+const jwt = require( 'jsonwebtoken' );
 const sharp = require( 'sharp' );
 const bcrypt = require( 'bcryptjs' );
 const ApiError = require( '../utils/apiError' )
@@ -74,17 +75,25 @@ exports.changeUserPassword = asyncHandler( async ( req, res, next ) => {
     const document = await User.findByIdAndUpdate(
         req.params.id,
         {
-            password: await bcrypt.hash( req.body.password, 12 )
+            password: await bcrypt.hash( req.body.password, 12 ),
+            passwordChangedAt: Date.now(),
         },
         { new: true }
     );
 
     if ( !document ) {
-        // res.status(404).json({ msg: `document not found` });
-        return next( new ApiError( `document not found`, 404 ) );
+        return next( new ApiError( `Not found`, 404 ) );
     }
 
-    res.status( 200 ).json( { data: document } );
+    const token = jwt.sign(
+        { userId: document._id },
+        process.env.JWT_SECRET_KEY,
+        {
+            expiresIn: process.env.JWT_EXPIRE_TIME
+        }
+    );
+
+    res.status( 200 ).json( { data: document, token } );
 } );
 
 // @desc    Delete specific user

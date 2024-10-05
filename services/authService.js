@@ -89,6 +89,16 @@ exports.protect = asyncHandler( async ( req, res, next ) => {
     }
 
     // 4) Check if user changed password after the token was craeted
+
+    if ( user.passwordChangedAt ) {
+        const passwordChangedAt = parseInt( user.passwordChangedAt.getTime() / 1000, 10 );
+
+        if ( passwordChangedAt > decoded.iat ) {
+            return next( new ApiError( `User recently changed password. Please login again`, 401 ) );
+        }
+    }
+
+
     next();
 } );
 
