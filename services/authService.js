@@ -4,7 +4,6 @@ const bcrypt = require( 'bcryptjs' );
 const ApiError = require( '../utils/apiError' );
 const User = require( '../models/userModel' );
 
-
 // @desc    Signup 
 // @route   POST  /api/v1/auth/signup
 // @access  Public
@@ -102,6 +101,8 @@ exports.protect = asyncHandler( async ( req, res, next ) => {
     if ( !user.active ) {
         return next( new ApiError( `User with this email is not active`, 401 ) );
     }
+    
+    req.user = user
 
     next();
 } );
