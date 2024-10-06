@@ -1,6 +1,6 @@
 const express = require( "express" );
 
-const { protect } = require( "../services/authService" );
+const { protect, allowTo } = require( "../services/authService" );
 
 const {
   getBrandValidator,
@@ -26,6 +26,7 @@ router
   .get( getBrands )
   .post(
     protect,
+    allowTo( "admin", "manager" ),
     uploadBrandImage,
     resizeImage,
     createBrandValidator,
@@ -36,12 +37,19 @@ router
   .route( "/:id" )
   .get( getBrandValidator, getBrand )
   .put(
+    protect,
+    allowTo( "admin", "manager" ),
     uploadBrandImage,
     resizeImage,
     updateBrandValidator,
     updateBrand,
   )
-  .delete( deleteBrandValidator, deleteBrand );
+  .delete(
+    protect,
+    allowTo( "admin" ),
+    deleteBrandValidator,
+    deleteBrand,
+  );
 
 // router.post("/", createBrand);
 // router.get("/", getBrands);
