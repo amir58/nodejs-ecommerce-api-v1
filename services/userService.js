@@ -98,6 +98,29 @@ exports.getLoggedUserData = asyncHandler( async ( req, res, next ) => {
     res.status( 200 ).json( { data: req.user, } );
 } );
 
+// @desc    Update user data ( Execpt password & role )
+// @route   PUT /api/v1/users/:id
+// @access  Private/User
+exports.updateLoggedUserData = asyncHandler( async ( req, res, next ) => {
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            name: req.body.name,
+            email: req.body.email,
+            phone: req.body.phone,
+
+        },
+        { new: true }
+    );
+
+    if ( !user ) {
+        return next( new ApiError( `Not found`, 404 ) );
+    }
+
+
+    res.status( 200 ).json( { data: user } );
+} );
+
 // @desc    Update user password
 // @route   PUT /api/v1/users/:id
 // @access  Private/User
@@ -119,6 +142,7 @@ exports.updateLoggedUserPassword = asyncHandler( async ( req, res, next ) => {
 
     res.status( 200 ).json( { token: token } );
 } );
+
 
 
 

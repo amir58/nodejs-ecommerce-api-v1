@@ -9,6 +9,7 @@ const {
     changeUserPasswordValidator,
     deleteUserValidator,
     updateLoggedUserPasswordValidator,
+    updateLoggedUserValidator,
 } = require( '../utils/validators/userValidators' );
 
 const {
@@ -22,6 +23,7 @@ const {
     resizeImage,
     getLoggedUserData,
     updateLoggedUserPassword,
+    updateLoggedUserData,
 } = require( '../services/userService' );
 
 
@@ -33,10 +35,17 @@ router.use(
 );
 
 router.get( '/profile', getLoggedUserData );
+
 router.put(
     '/changeMyPassword',
     updateLoggedUserPasswordValidator,
     updateLoggedUserPassword,
+);
+
+router.put(
+    '/updateProfile',
+    updateLoggedUserValidator,
+    updateLoggedUserData,
 );
 
 router
