@@ -19,32 +19,40 @@ const {
     deleteUser,
     uploadUserImage,
     resizeImage,
+    getLoggedUserData,
 } = require( '../services/userService' );
 
 
 const router = express.Router();
 
+router.use(
+    protect,
+    // allowTo( "admin", "manager" ),
+);
+
+router.get( '/profile', getLoggedUserData );
+
 router
     .route( '/' )
     .get(
-        protect,
+        // protect,
         allowTo( "admin", "manager" ),
         getUsers,
     )
     .post(
-        protect,
+        // protect,
         allowTo( "admin" ),
         uploadUserImage, resizeImage, createUserValidator, createUser );
 
 router
     .route( '/:id' )
     .get(
-        protect,
+        // protect,
         allowTo( "admin", "manager" ),
         getUserValidator,
         getUser )
     .put(
-        protect,
+        // protect,
         allowTo( "admin" ),
         uploadUserImage,
         resizeImage,
@@ -52,7 +60,7 @@ router
         updateUser,
     )
     .delete(
-        protect,
+        // protect,
         allowTo( "admin" ),
         deleteUserValidator,
         deleteUser

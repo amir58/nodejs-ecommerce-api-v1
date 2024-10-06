@@ -96,6 +96,14 @@ exports.changeUserPassword = asyncHandler( async ( req, res, next ) => {
     res.status( 200 ).json( { data: document, token } );
 } );
 
+
+// @desc    Update user password
+// @route   PUT /api/v1/users/:id
+// @access  Private/User
+exports.getLoggedUserData = asyncHandler( async ( req, res, next ) => {
+    res.status( 200 ).json( { data: req.user, } );
+} );
+
 // @desc    Delete specific user
 // @route   DELETE /api/v1/users/:id
 // @access  Private/Admin
@@ -113,3 +121,5 @@ exports.deleteUser = asyncHandler( async ( req, res, next ) => {
 
     res.status( 200 ).json( { data: document } );
 } );
+
+
