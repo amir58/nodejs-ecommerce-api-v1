@@ -181,7 +181,7 @@ exports.verifyPassResetCode = asyncHandler( async ( req, res, next ) => {
 
     console.log( user );
     user.passwordResetVerified = true;
-    await user.save(); /// TODO: save
+    await user.save();
     console.log( user );
 
     res.status( 200 ).json( {
@@ -191,3 +191,33 @@ exports.verifyPassResetCode = asyncHandler( async ( req, res, next ) => {
 
 } );
 
+exports.resetPassword = asyncHandler( async ( req, res, next ) => {
+    const user = await User.findOne( {
+        email: req.body.email,
+    } );
+
+    if ( !user ) {
+        return next( new ApiError( `Resest code is invalid or has expired`, 404 ) );
+    }
+
+    user.password = req.body.password;
+    user.passwordChangedAt = Date.now();
+    user.passwordResetCode = undefined;
+    user.passwordResetExpires = undefined;
+    user.passwordResetVerified = undefined;
+
+    await user.save();
+
+    const token = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET_KEY, {
+        expiresIn: process.env.JWT_EXPIRE_TIME
+    } );
+
+    res.status( 200 ).json( {
+        status: "success",
+        message: "Password changed successfully",
+        token: token,
+    } );
+
+} );

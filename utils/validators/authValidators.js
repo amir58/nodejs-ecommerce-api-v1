@@ -79,4 +79,13 @@ exports.forgetPasswordValidator = [
     validatorMiddleware,
 ];
 
+exports.resetPasswordValidator = [
+    check( 'email' )
+        .notEmpty()
+        .withMessage( 'Email required' )
+        .isEmail()
+        .withMessage( 'Invalid email address' ),
+
+    validatorMiddleware,
+];
 
