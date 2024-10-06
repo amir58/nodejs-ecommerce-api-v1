@@ -162,3 +162,32 @@ exports.forgetPassword = asyncHandler( async ( req, res, next ) => {
     } );
 } );
 
+exports.verifyPassResetCode = asyncHandler( async ( req, res, next ) => {
+
+    const hashedResetCode = crypto
+        .createHash( "sha256" )
+        .update( req.body.resetCode )
+        .digest( "hex" );
+
+
+    const user = await User.findOne( {
+        passwordResetCode: hashedResetCode,
+        passwordResetExpires: { $gt: Date.now() }
+    } );
+
+    if ( !user ) {
+        return next( new ApiError( `Resest code is invalid or has expired`, 404 ) );
+    }
+
+    console.log( user );
+    user.passwordResetVerified = true;
+    await user.save(); /// TODO: save
+    console.log( user );
+
+    res.status( 200 ).json( {
+        status: "success",
+        message: "Reset code verified",
+    } );
+
+} );
+

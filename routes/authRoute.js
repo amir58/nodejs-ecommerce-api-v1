@@ -10,6 +10,7 @@ const {
     signup,
     login,
     forgetPassword,
+    verifyPassResetCode,
 } = require( '../services/authService' );
 
 
@@ -22,6 +23,7 @@ router
 router.route( '/login' ).post( loginValidator, login );
 
 router.post( '/forgetPassword', forgetPasswordValidator, forgetPassword );
+router.post( '/verifyResetCode', verifyPassResetCode );
 
 // router
 //     .route( '/:id' )
