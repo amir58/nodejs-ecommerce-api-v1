@@ -3,11 +3,13 @@ const express = require( 'express' );
 const {
     signupValidator,
     loginValidator,
+    forgetPasswordValidator,
 } = require( '../utils/validators/authValidators' );
 
 const {
     signup,
     login,
+    forgetPassword,
 } = require( '../services/authService' );
 
 
@@ -18,6 +20,8 @@ router
     .post( signupValidator, signup );
 
 router.route( '/login' ).post( loginValidator, login );
+
+router.post( '/forgetPassword', forgetPasswordValidator, forgetPassword );
 
 // router
 //     .route( '/:id' )

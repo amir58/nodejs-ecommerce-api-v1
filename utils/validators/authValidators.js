@@ -68,3 +68,15 @@ exports.loginValidator = [
     validatorMiddleware,
 ];
 
+
+exports.forgetPasswordValidator = [
+    check( 'email' )
+        .notEmpty()
+        .withMessage( 'Email required' )
+        .isEmail()
+        .withMessage( 'Invalid email address' ),
+
+    validatorMiddleware,
+];
+
+

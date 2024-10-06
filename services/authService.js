@@ -1,6 +1,7 @@
 const asyncHandler = require( 'express-async-handler' );
 const jwt = require( 'jsonwebtoken' );
 const bcrypt = require( 'bcryptjs' );
+const crypto = require( 'crypto' );
 const ApiError = require( '../utils/apiError' );
 const User = require( '../models/userModel' );
 
@@ -113,4 +114,24 @@ exports.allowTo = ( ...roles ) => asyncHandler( ( req, res, next ) => {
     next();
 }
 );
+
+
+exports.forgetPassword = asyncHandler( async ( req, res, next ) => {
+    const user = await User.findOne( { email: req.body.email } );
+    if ( !user ) {
+        return next( new ApiError( `There is no user with this email`, 404 ) );
+    }
+
+    const resetCode = Math.floor( 100000 + Math.random() * 900000 ).toString();
+    const hashedResetCode = crypto
+        .createHash( "sha256" )
+        .update( resetCode )
+        .digest( "hex" );
+
+    user.passwordResetCode = hashedResetCode;
+    user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    user.passwordResetVerified = false;
+
+    await user.save();
+} );
 
