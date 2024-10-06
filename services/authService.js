@@ -2,6 +2,7 @@ const asyncHandler = require( 'express-async-handler' );
 const jwt = require( 'jsonwebtoken' );
 const bcrypt = require( 'bcryptjs' );
 const crypto = require( 'crypto' );
+const sendEmail = require( '../utils/sendEmail' );
 const ApiError = require( '../utils/apiError' );
 const User = require( '../models/userModel' );
 
@@ -133,5 +134,31 @@ exports.forgetPassword = asyncHandler( async ( req, res, next ) => {
     user.passwordResetVerified = false;
 
     await user.save();
+
+    const message = `Hi ${ user.name }, 
+    \n We received a request to reset your password on out E-Shop account.
+    \n Your password reset code is: ${ resetCode } 
+    \n Valid for 10 minutes. 
+    \n If you did not request a password reset, please ignore this email.`;
+
+    try {
+        await sendEmail( {
+            email: user.email,
+            subject: "Password Reset Code",
+            message: message
+        } );
+    } catch ( err ) {
+        user.passwordResetCode = undefined;
+        user.passwordResetExpires = undefined;
+        user.passwordResetVerified = undefined;
+
+        await user.save();
+        return next( new ApiError( `Email could not be sent`, 500 ) );
+    }
+
+    res.status( 200 ).json( {
+        status: "success",
+        message: "Reset code sent to your email",
+    } );
 } );
 
