@@ -139,3 +139,30 @@ exports.deleteUserValidator = [
 
     validatorMiddleware,
 ];
+
+exports.updateLoggedUserPasswordValidator = [
+    check( 'password' )
+        .notEmpty()
+        .withMessage( 'Password required' )
+        .isLength( { min: 6 } )
+        .withMessage( 'Password must be at least 6 characters' ),
+
+    check( 'passwordConfirm' )
+        .notEmpty()
+        .withMessage( 'Password confirmation required' )
+        .custom( async ( val, { req } ) => {
+            const user = await User.findById( req.user.id )
+
+            if ( !user ) {
+                return Promise.reject( new Error( 'User not found' ) );
+            }
+
+            if ( req.body.password !== req.body.passwordConfirm ) {
+                return Promise.reject( new Error( 'Password Confirmation incorrect' ) );
+            }
+            return true;
+        }
+        ),
+
+    validatorMiddleware,
+];

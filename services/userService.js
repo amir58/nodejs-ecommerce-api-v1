@@ -1,8 +1,8 @@
 const asyncHandler = require( 'express-async-handler' );
 const { v4: uuidv4 } = require( 'uuid' );
-const jwt = require( 'jsonwebtoken' );
 const sharp = require( 'sharp' );
 const bcrypt = require( 'bcryptjs' );
+const createToken = require( '../utils/createToken' );
 const ApiError = require( '../utils/apiError' )
 const factory = require( './handlersFactory' );
 const { uploadSingleImage } = require( '../middlewares/uploadImageMiddleware' );
@@ -85,13 +85,7 @@ exports.changeUserPassword = asyncHandler( async ( req, res, next ) => {
         return next( new ApiError( `Not found`, 404 ) );
     }
 
-    const token = jwt.sign(
-        { userId: document._id },
-        process.env.JWT_SECRET_KEY,
-        {
-            expiresIn: process.env.JWT_EXPIRE_TIME
-        }
-    );
+    const token = createToken( document._id );
 
     res.status( 200 ).json( { data: document, token } );
 } );
@@ -103,6 +97,30 @@ exports.changeUserPassword = asyncHandler( async ( req, res, next ) => {
 exports.getLoggedUserData = asyncHandler( async ( req, res, next ) => {
     res.status( 200 ).json( { data: req.user, } );
 } );
+
+// @desc    Update user password
+// @route   PUT /api/v1/users/:id
+// @access  Private/User
+exports.updateLoggedUserPassword = asyncHandler( async ( req, res, next ) => {
+    const document = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            password: await bcrypt.hash( req.body.password, 12 ),
+            passwordChangedAt: Date.now(),
+        },
+        { new: true }
+    );
+
+    if ( !document ) {
+        return next( new ApiError( `Not found`, 404 ) );
+    }
+
+    const token = createToken( document._id );
+
+    res.status( 200 ).json( { token: token } );
+} );
+
+
 
 // @desc    Delete specific user
 // @route   DELETE /api/v1/users/:id
