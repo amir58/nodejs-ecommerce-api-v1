@@ -121,6 +121,26 @@ exports.updateLoggedUserData = asyncHandler( async ( req, res, next ) => {
     res.status( 200 ).json( { data: user } );
 } );
 
+// @desc    Delete user ( Deactivate )
+// @route   Delete /api/v1/users/deleteMe
+// @access  Private/User
+exports.deleteLoggedUser = asyncHandler( async ( req, res, next ) => {
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            active: false
+        },
+        { new: true }
+    );
+
+    if ( !user ) {
+        return next( new ApiError( `Not found`, 404 ) );
+    }
+
+    res.status( 204 ).json( { msg: 'user deleted' } );
+} );
+
+
 // @desc    Update user password
 // @route   PUT /api/v1/users/:id
 // @access  Private/User

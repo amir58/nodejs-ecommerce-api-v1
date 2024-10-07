@@ -24,6 +24,7 @@ const {
     getLoggedUserData,
     updateLoggedUserPassword,
     updateLoggedUserData,
+    deleteLoggedUser,
 } = require( '../services/userService' );
 
 
@@ -46,6 +47,11 @@ router.put(
     '/updateProfile',
     updateLoggedUserValidator,
     updateLoggedUserData,
+);
+
+router.delete(
+    '/deleteMe',
+    deleteLoggedUser,
 );
 
 router
