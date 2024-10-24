@@ -10,21 +10,24 @@ const {
 } = require( "../utils/validators/reviewValidators" )
 
 const {
+  createFilterObject,
   getReviews,
   getReview,
+  setProductIdAndUserIdToBody,
   createReview,
   updateReview,
   deleteReview,
 
 } = require( "../services/reviewService" );
 
-const router = express.Router();
+const router = express.Router( { mergeParams: true } );
 
 router
   .route( "/" )
-  .get( getReviews )
+  .get( createFilterObject, getReviews )
   .post(
     protect,
+    setProductIdAndUserIdToBody,
     createReviewValidator,
     createReview,
   );

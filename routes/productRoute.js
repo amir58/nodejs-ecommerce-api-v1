@@ -1,4 +1,5 @@
 const express = require( "express" );
+const reviewRoute = require( "./reviewRoute" );
 
 const { protect, allowTo } = require( "../services/authService" );
 
@@ -20,6 +21,11 @@ const {
 } = require( "../services/productService" );
 
 const router = express.Router();
+
+// Nested Route
+// GET /products/:productId/reviews
+router.use( "/:productId/reviews", reviewRoute );
+
 
 router
   .route( "/" )
