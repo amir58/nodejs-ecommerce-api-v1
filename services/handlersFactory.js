@@ -36,8 +36,17 @@ exports.getAll = ( Model, modelName = '' ) => asyncHandler( async ( req, res ) =
     } );
 } );
 
-exports.getOne = ( Model ) => asyncHandler( async ( req, res, next ) => {
-    const document = await Model.findById( req.params.id );
+exports.getOne = ( Model, populationOptions ) => asyncHandler( async ( req, res, next ) => {
+    const {id} = req.params;
+
+    // 1) Build query
+    let query = Model.findById( id );
+    if ( populationOptions ) {
+        query = query.populate( populationOptions );
+    }
+
+    // 2) Execute query
+    const document = await query;
 
     if ( !document ) {
         return next( new ApiError( `document not found`, 404 ) );

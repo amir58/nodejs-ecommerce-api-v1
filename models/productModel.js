@@ -72,8 +72,19 @@ const productSchema = new mongoose.Schema(
             min: [ 0, "Quantity must be more than 0" ],
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
+    }
 );
+
+productSchema.virtual( 'reviews', {
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'product',
+} );
+
 
 productSchema.pre( /^find/, function ( next ) {
     this.populate( {
@@ -100,6 +111,8 @@ const setImageURL = ( doc ) => {
 
 productSchema.post( 'init', ( doc ) => { setImageURL( doc ) } );
 productSchema.post( 'save', ( doc ) => { setImageURL( doc ) } );
+
+
 
 
 // 2 - Create model
