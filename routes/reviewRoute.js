@@ -25,25 +25,25 @@ router
   .get( getReviews )
   .post(
     protect,
-    // createReviewValidator,
+    createReviewValidator,
     createReview,
   );
 
 router
   .route( "/:id" )
   .get(
-    // getReviewValidator,
+    getReviewValidator,
     getReview,
   )
   .put(
     protect,
     allowTo( "user" ),
-    // updateReviewValidator,
+    updateReviewValidator,
     updateReview,
   )
   .delete(
     protect,
-    // deleteReviewValidator,
+    deleteReviewValidator,
     deleteReview,
   );
 
