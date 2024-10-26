@@ -29,7 +29,7 @@ router.use( "/:productId/reviews", reviewRoute );
 
 router
   .route( "/" )
-  .get( getProducts )
+  .get( protect, getProducts )
   .post(
     protect,
     allowTo( "admin", "manager" ),
@@ -41,7 +41,7 @@ router
 
 router
   .route( "/:id" )
-  .get( getProductValidator, getProduct )
+  .get( protect, getProductValidator, getProduct )
   .put(
     protect,
     allowTo( "admin", "manager" ),

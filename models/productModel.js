@@ -71,6 +71,10 @@ const productSchema = new mongoose.Schema(
             default: 0,
             min: [ 0, "Quantity must be more than 0" ],
         },
+        isFavourite: {
+            type: Boolean,
+            default: false,
+        }
     },
     {
         timestamps: true,
@@ -109,8 +113,13 @@ const setImageURL = ( doc ) => {
     }
 }
 
-productSchema.post( 'init', ( doc ) => { setImageURL( doc ) } );
-productSchema.post( 'save', ( doc ) => { setImageURL( doc ) } );
+
+productSchema.post( 'init', ( doc ) => {
+    setImageURL( doc )
+} );
+productSchema.post( 'save', ( doc ) => {
+    setImageURL( doc )
+} );
 
 
 

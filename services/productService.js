@@ -2,8 +2,11 @@ const asyncHandler = require( "express-async-handler" );
 const sharp = require( "sharp" );
 const { v4: uuid } = require( "uuid" );
 const { uploadMixOfImages } = require( "../middlewares/uploadImageMiddleware" );
+const ApiError = require( "../utils/apiError" );
 const Product = require( "../models/productModel" );
+const ApiFetaures = require( "../utils/apiFeatures" );
 const factory = require( "./handlersFactory" );
+const User = require( "../models/userModel" );
 
 exports.uploadImages = uploadMixOfImages( [
     {
@@ -62,12 +65,77 @@ exports.createProduct = factory.createOne( Product );
 // @desc    Get list of products
 // @route   GET /api/v1/products
 // @access  Public
-exports.getProducts = factory.getAll( Product, 'products' );
+// exports.getProducts = factory.getAll( Product, 'products' );
+
+exports.getProducts = asyncHandler( async ( req, res ) => {
+    let filter = {};
+    console.log( req.filterObject );
+    if ( req.filterObject ) {
+        filter = req.filterObject;
+    }
+
+    const countDocuments = await Product.countDocuments();
+
+    const apiFeatures = new ApiFetaures( Product.find( filter ), req.query );
+
+    apiFeatures
+        .paginate( countDocuments )
+        .filter()
+        .sort()
+        .limitFields()
+        .search( 'products' );
+
+    const { mongooseQuery, pagingResults } = apiFeatures;
+    const documents = await mongooseQuery;
+
+    if ( req.user ) {
+        const user = await User.findById( req.user._id );
+
+        documents.forEach( document => {
+            if ( user.wishlist.includes( document._id ) ) {
+                document.isFavourite = true;
+            }
+        } );
+    }
+
+    res.status( 200 ).json( {
+        results: documents.length,
+        pagingResults,
+        data: documents,
+    } );
+} );
 
 // @desc    Get specific Product
 // @route   GET /api/v1/products/:id
 // @access  Public
-exports.getProduct = factory.getOne( Product, 'reviews' );
+// exports.getProduct = factory.getOne( Product, 'reviews' );
+
+exports.getProduct = asyncHandler( async ( req, res, next ) => {
+
+    // 1) Build query
+    let query = Product.findById( req.params.id );
+    query = query.populate( "reviews" );
+
+
+    // 2) Execute query
+    const document = await query;
+
+    if ( !document ) {
+        return next( new ApiError( `document not found`, 404 ) );
+    }
+
+    if ( req.user ) {
+        const user = await User.findById( req.user._id );
+
+        if ( user.wishlist.includes( document._id ) ) {
+            document.isFavourite = true;
+        }
+    }
+
+
+    res.status( 200 ).json( { data: document } );
+} );
+
 // @desc    Update Product
 // @route   PUT /api/v1/products/:id
 // @access  Private
