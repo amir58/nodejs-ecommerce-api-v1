@@ -33,9 +33,7 @@ exports.addProductToWishList = asyncHandler( async ( req, res, next ) => {
 // @access  Protected/User
 exports.getWishList = asyncHandler( async ( req, res, next ) => {
     const user = await User.findById( req.user._id ).populate( 'wishlist' );
-
-    console.log( user );
-
+    
     res.status( 200 ).json( {
         status: 'success',
         data: user.wishlist,
