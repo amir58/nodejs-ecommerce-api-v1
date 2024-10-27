@@ -4,12 +4,14 @@ const { protect, allowTo } = require( "../services/authService" );
 
 const {
   addAddressValidator,
+  updateAddressValidator,
   removeAddressValidator,
 } = require( "../utils/validators/addressValidators" )
 
 const {
   addAddress,
   getLoggedUserAddresses,
+  updateAddress,
   removeAddress,
 } = require( "../services/addressService" );
 
@@ -25,10 +27,15 @@ router
   )
   .get( getLoggedUserAddresses );
 
-router.delete(
-  "/:addressId",
-  removeAddressValidator,
-  removeAddress,
-);
+router
+  .route( "/:addressId" )
+  .put(
+    updateAddressValidator,
+    updateAddress,
+  )
+  .delete(
+    removeAddressValidator,
+    removeAddress,
+  );
 
 module.exports = router;
