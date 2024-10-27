@@ -43,6 +43,13 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Schema.ObjectId,
             ref: 'Product',
         } ],
+        addresses: [ {
+            id: { type: mongoose.Schema.ObjectId },
+            alias: String,
+            details: String,
+            phone: String,
+            postalCode: String,
+        } ],
     },
     { timestamps: true }
 );
