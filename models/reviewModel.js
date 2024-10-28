@@ -1,4 +1,5 @@
 const mongoose = require( "mongoose" );
+const round = require( "../utils/numbersUtil" );
 const Product = require( "./productModel" );
 
 // 1 - Create schema
@@ -34,10 +35,6 @@ reviewSchema.pre( /^find/, function ( next ) {
     next();
 } );
 
-function round( num, decimals ) {
-    const n = 10 ** decimals;
-    return Math.round( ( n * num ).toFixed( decimals ) ) / n;
-};
 
 reviewSchema.statics.calculateRatingsAverageAndRatingsQuantity = async function ( productId ) {
     const result = await this.aggregate(
