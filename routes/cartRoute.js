@@ -10,10 +10,9 @@ const {
 } = require( "../utils/validators/brandValidators" )
 
 const {
-  getCarts,
   getCart,
   addProductToCart,
-  updateCart,
+  updateCartItem,
   removeCartItem,
   clearCart,
 } = require( "../services/cartService" );
@@ -33,13 +32,10 @@ router
 
 router
   .route( "/:cartItemId" )
-  //   .get( getCartValidator, getCart )
-  //   .put(
-  //     protect,
-  //     allowTo( "admin", "manager" ),
-  //     updateCartValidator,
-  //     updateCart,
-  //   )
+  .put(
+    //     updateCartValidator,
+    updateCartItem,
+  )
   .delete(
     //     deleteCartValidator,
     removeCartItem,

@@ -79,6 +79,34 @@ exports.getCart = asyncHandler( async ( req, res, next ) => {
 } )
 
 
+// @desc    Update cart item 
+// @route   PUT  /api/v1/cart/:cartItemId
+// @access  Protected/User
+exports.updateCartItem = asyncHandler( async ( req, res, next ) => {
+    const cart = await Cart.findOne( { user: req.user._id } );
+
+    if ( !cart ) {
+        return next( new ApiError( `Product not found in cart`, 404 ) );
+    }
+
+    const itemIndex = cart.items.findIndex( item =>
+        item._id.toString() === req.params.cartItemId
+    );
+
+    if ( itemIndex > -1 ) {
+        cart.items[ itemIndex ].quantity = req.body.quantity;
+    }
+    else {
+        return next( new ApiError( `Product not found in cart`, 404 ) );
+    }
+
+    cart.totalPrice = calculateTotalPrice( cart );
+
+    await cart.save();
+
+    res.status( 200 ).json( { cart } );
+} )
+
 // @desc    Remove cart item 
 // @route   DELETE  /api/v1/cart/:productId
 // @access  Protected/User
