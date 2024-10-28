@@ -14,8 +14,14 @@ const calculateTotalPrice = ( cart ) => {
     return round( totalPrice, 2 );
 }
 
+const emptyCart = ( req, res ) => res.status( 200 ).json( {
+    items: [],
+    totalPrice: 0,
+    user: req.user._id,
+} );
+
 // @desc    Add product to cart
-// @route   POST  /api/v1/carts
+// @route   POST  /api/v1/cart
 // @access  Protected/User
 exports.addProductToCart = asyncHandler( async ( req, res, next ) => {
     const { productId, color } = req.body;
@@ -59,18 +65,14 @@ exports.addProductToCart = asyncHandler( async ( req, res, next ) => {
 
 
 // @desc    Get cart
-// @route   GET  /api/v1/carts
+// @route   GET  /api/v1/cart
 // @access  Protected/User
 exports.getCart = asyncHandler( async ( req, res, next ) => {
     const cart = await Cart.findOne( { user: req.user._id } )
     // .populate( 'items.product', 'title desccription price priceAfterDiscount image imageCover' );
 
     if ( !cart ) {
-        return res.status( 200 ).json( {
-            items: [],
-            totalPrice: 0,
-            user: req.user._id,
-        } );
+        return emptyCart( req, res )
     }
 
     return res.status( 200 ).json( { cart } );
@@ -78,7 +80,7 @@ exports.getCart = asyncHandler( async ( req, res, next ) => {
 
 
 // @desc    Remove cart item 
-// @route   DELETE  /api/v1/carts/:productId
+// @route   DELETE  /api/v1/cart/:productId
 // @access  Protected/User
 exports.removeCartItem = asyncHandler( async ( req, res, next ) => {
     const cart = await Cart.findOneAndUpdate(
@@ -93,3 +95,13 @@ exports.removeCartItem = asyncHandler( async ( req, res, next ) => {
 
     res.status( 200 ).json( { cart } );
 } )
+
+// @desc    Clear cart  
+// @route   DELETE  /api/v1/cart
+// @access  Protected/User
+exports.clearCart = asyncHandler( async ( req, res, next ) => {
+    await Cart.findOneAndDelete( { user: req.user._id } );
+
+    return emptyCart( req, res );
+} )
+

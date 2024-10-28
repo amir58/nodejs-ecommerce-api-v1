@@ -15,6 +15,7 @@ const {
   addProductToCart,
   updateCart,
   removeCartItem,
+  clearCart,
 } = require( "../services/cartService" );
 
 const router = express.Router();
@@ -27,7 +28,8 @@ router
   .post(
     // createCartValidator,
     addProductToCart,
-  );
+  )
+  .delete( clearCart );
 
 router
   .route( "/:cartItemId" )
