@@ -14,7 +14,7 @@ const {
   getCart,
   addProductToCart,
   updateCart,
-  deleteCart,
+  removeCartItem,
 } = require( "../services/cartService" );
 
 const router = express.Router();
@@ -29,21 +29,19 @@ router
     addProductToCart,
   );
 
-// router
-//   .route( "/:id" )
-//   .get( getCartValidator, getCart )
-//   .put(
-//     protect,
-//     allowTo( "admin", "manager" ),
-//     updateCartValidator,
-//     updateCart,
-//   )
-//   .delete(
-//     protect,
-//     allowTo( "admin" ),
-//     deleteCartValidator,
-//     deleteCart,
-//   );
+router
+  .route( "/:cartItemId" )
+  //   .get( getCartValidator, getCart )
+  //   .put(
+  //     protect,
+  //     allowTo( "admin", "manager" ),
+  //     updateCartValidator,
+  //     updateCart,
+  //   )
+  .delete(
+    //     deleteCartValidator,
+    removeCartItem,
+  );
 
 
 module.exports = router;

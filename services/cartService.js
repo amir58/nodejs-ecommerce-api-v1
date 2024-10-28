@@ -75,3 +75,21 @@ exports.getCart = asyncHandler( async ( req, res, next ) => {
 
     return res.status( 200 ).json( { cart } );
 } )
+
+
+// @desc    Remove cart item 
+// @route   DELETE  /api/v1/carts/:productId
+// @access  Protected/User
+exports.removeCartItem = asyncHandler( async ( req, res, next ) => {
+    const cart = await Cart.findOneAndUpdate(
+        { user: req.user._id },
+        { $pull: { items: { _id: req.params.cartItemId } } },
+        { new: true },
+    );
+
+    cart.totalPrice = calculateTotalPrice( cart );
+
+    await cart.save();
+
+    res.status( 200 ).json( { cart } );
+} )
