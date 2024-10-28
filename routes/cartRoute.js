@@ -23,7 +23,7 @@ router.use( protect, allowTo( "user" ) );
 
 router
   .route( "/" )
-  // .get( getCarts )
+  .get( getCart )
   .post(
     // createCartValidator,
     addProductToCart,

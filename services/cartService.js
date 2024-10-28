@@ -3,7 +3,7 @@ const asyncHandler = require( 'express-async-handler' );
 const round = require( '../utils/numbersUtil' );
 const Cart = require( '../models/cartModel' );
 const Product = require( '../models/productModel' );
-// const ApiError = require( '../utils/apiError' );
+const ApiError = require( '../utils/apiError' );
 
 const calculateTotalPrice = ( cart ) => {
     // Calculate total price and total price after discount
@@ -57,3 +57,21 @@ exports.addProductToCart = asyncHandler( async ( req, res, next ) => {
     } );
 } );
 
+
+// @desc    Get cart
+// @route   GET  /api/v1/carts
+// @access  Protected/User
+exports.getCart = asyncHandler( async ( req, res, next ) => {
+    const cart = await Cart.findOne( { user: req.user._id } )
+    // .populate( 'items.product', 'title desccription price priceAfterDiscount image imageCover' );
+
+    if ( !cart ) {
+        return res.status( 200 ).json( {
+            items: [],
+            totalPrice: 0,
+            user: req.user._id,
+        } );
+    }
+
+    return res.status( 200 ).json( { cart } );
+} )
