@@ -3,11 +3,11 @@ const express = require( "express" );
 const { protect, allowTo } = require( "../services/authService" );
 
 const {
-  getCartValidator,
-  createCartValidator,
-  updateCartValidator,
-  deleteCartValidator,
-} = require( "../utils/validators/brandValidators" )
+  addProductToCartValidator,
+  updateCartItemValidator,
+  removeCartItemValidator,
+  applyCouponValidator,
+} = require( "../utils/validators/cartValidators" )
 
 const {
   getCart,
@@ -26,21 +26,25 @@ router
   .route( "/" )
   .get( getCart )
   .post(
-    // createCartValidator,
+    addProductToCartValidator,
     addProductToCart,
   )
   .delete( clearCart );
 
-router.route( "/applyCoupon" ).post( applyCoupon );
+router.route( "/applyCoupon" )
+  .post(
+    applyCouponValidator,
+    applyCoupon,
+  );
 
 router
   .route( "/:cartItemId" )
   .put(
-    //     updateCartValidator,
+    updateCartItemValidator,
     updateCartItem,
   )
   .delete(
-    //     deleteCartValidator,
+    removeCartItemValidator,
     removeCartItem,
   );
 

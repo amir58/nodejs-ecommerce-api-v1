@@ -11,7 +11,7 @@ const calculateTotalPrice = ( cart ) => {
 
     let totalPrice = 0;
     cart.items.forEach( item => { totalPrice += item.price * item.quantity; } );
-    
+
     return totalPrice.toFixed( 2 );
 }
 
@@ -28,6 +28,10 @@ exports.addProductToCart = asyncHandler( async ( req, res, next ) => {
     const { productId, color } = req.body;
 
     const product = await Product.findById( productId );
+
+    if ( !product ) {
+        return next( new ApiError( 'Product not found', 404 ) );
+    }
 
     let cart = await Cart.findOne( { user: req.user._id } );
 
