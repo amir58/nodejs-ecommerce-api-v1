@@ -12,6 +12,7 @@ const {
 const {
   getCart,
   addProductToCart,
+  applyCoupon,
   updateCartItem,
   removeCartItem,
   clearCart,
@@ -29,6 +30,8 @@ router
     addProductToCart,
   )
   .delete( clearCart );
+
+router.route( "/applyCoupon" ).post( applyCoupon );
 
 router
   .route( "/:cartItemId" )

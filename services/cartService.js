@@ -1,8 +1,8 @@
 const asyncHandler = require( 'express-async-handler' );
 
-const round = require( '../utils/numbersUtil' );
 const Cart = require( '../models/cartModel' );
 const Product = require( '../models/productModel' );
+const Coupon = require( '../models/couponModel' );
 const ApiError = require( '../utils/apiError' );
 
 const calculateTotalPrice = ( cart ) => {
@@ -11,7 +11,8 @@ const calculateTotalPrice = ( cart ) => {
 
     let totalPrice = 0;
     cart.items.forEach( item => { totalPrice += item.price * item.quantity; } );
-    return round( totalPrice, 2 );
+    
+    return totalPrice.toFixed( 2 );
 }
 
 const emptyCart = ( req, res ) => res.status( 200 ).json( {
@@ -78,6 +79,34 @@ exports.getCart = asyncHandler( async ( req, res, next ) => {
     return res.status( 200 ).json( { cart } );
 } )
 
+// @desc    Apply coupon 
+// @route   GET  /api/v1/cart/applyCoupon
+// @access  Protected/User
+exports.applyCoupon = asyncHandler( async ( req, res, next ) => {
+    const coupon = await Coupon.findOne( {
+        name: req.body.coupon,
+        expire: { $gt: Date.now() }
+
+    } );
+
+    if ( !coupon ) {
+        return next( new ApiError( `Coupon invalid or expired`, 404 ) );
+    }
+
+    const cart = await Cart.findOne( { user: req.user._id } )
+
+    if ( !cart ) {
+        return emptyCart( req, res )
+    }
+
+    // 109.9 - (109.9 * 50 / 100) = 54.45
+    console.log( coupon.discount );
+    cart.totlaPriceAfterDiscount = ( cart.totalPrice - ( cart.totalPrice * coupon.discount / 100 ) ).toFixed( 2 );
+
+    await cart.save();
+
+    return res.status( 200 ).json( { cart } );
+} )
 
 // @desc    Update cart item 
 // @route   PUT  /api/v1/cart/:cartItemId
