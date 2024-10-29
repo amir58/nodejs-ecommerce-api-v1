@@ -10,28 +10,38 @@ const {
 } = require( "../utils/validators/brandValidators" )
 
 const {
+  createOrder,
+  filterOrderForLoggedUsers,
   getOrders,
   getOrder,
-  createOrder,
   updateOrder,
   deleteOrder,
 } = require( "../services/orderService" );
 
 const router = express.Router();
 
-router.use( protect, allowTo( "user" ) );
+router.use( protect );
 
 router
   .route( "/" )
-  .get( getOrders )
+  .get(
+    allowTo( "user", "admin", "manager" ),
+    filterOrderForLoggedUsers,
+    getOrders
+  )
   .post(
+    allowTo( "user" ),
     // createOrderValidator,
     createOrder,
   );
 
-// router
-//   .route( "/:id" )
-//   .get( getOrderValidator, getOrder )
+router
+  .route( "/:id" )
+  .get(
+    allowTo( "user", "admin", "manager" ),
+    // getOrderValidator,
+    getOrder,
+  )
 //   .put(
 //     updateOrderValidator,
 //     updateOrder,

@@ -58,6 +58,14 @@ exports.createOrder = asyncHandler( async ( req, res, next ) => {
 
 } );
 
+exports.filterOrderForLoggedUsers = asyncHandler( async ( req, res, next ) => {
+    if(req.user.role === "user"){
+        req.filterObject = { user: req.user._id };
+    }
+    next();
+})
+
+
 // @desc    Get list of orders
 // @route   GET /api/v1/orders
 // @access  Private/Protect/User
