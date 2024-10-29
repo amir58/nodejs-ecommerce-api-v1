@@ -1,6 +1,7 @@
 const path = require( "path" );
 
 const express = require( "express" );
+const cors = require( "cors" );
 const dotenv = require( "dotenv" );
 const morgan = require( "morgan" );
 
@@ -31,6 +32,10 @@ const app = express();
 
 // Middleware
 app.use( express.json() );
+
+app.use( cors() );
+app.options( "*", cors() )
+
 app.use( express.static( path.join( __dirname, "uploads" ) ) );
 
 if ( process.env.MODE_ENV === "development" ) {
