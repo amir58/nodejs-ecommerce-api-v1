@@ -59,11 +59,11 @@ exports.createOrder = asyncHandler( async ( req, res, next ) => {
 } );
 
 exports.filterOrderForLoggedUsers = asyncHandler( async ( req, res, next ) => {
-    if(req.user.role === "user"){
+    if ( req.user.role === "user" ) {
         req.filterObject = { user: req.user._id };
     }
     next();
-})
+} )
 
 
 // @desc    Get list of orders
@@ -85,4 +85,46 @@ exports.updateOrder = factory.updateOne( Order );
 // @route   DELETE /api/v1/orders/:id
 // @access  Private/Protect/User
 exports.deleteOrder = factory.deleteOne( Order );
+
+// @desc    Update Order To Paid
+// @route   PUT /api/v1/orders/:id/pay
+// @access  Private/Protect/Admin-Manager
+exports.updateOrderToPaid = asyncHandler( async ( req, res, next ) => {
+    const order = await Order.findById( req.params.id );
+
+    if ( !order ) {
+        return next( new ApiError( `order not found`, 404 ) );
+    }
+
+    order.isPaid = true;
+    order.paidAt = Date.now();
+
+    const updatedOrder = await order.save();
+
+    res.status( 200 ).json( {
+        status: 'success',
+        data: updatedOrder,
+    } );
+} );
+
+// @desc    Update Order To Delivered
+// @route   PUT /api/v1/orders/:id/deliver
+// @access  Private/Protect/Admin-Manager
+exports.updateOrderToDelivered = asyncHandler( async ( req, res, next ) => {
+    const order = await Order.findById( req.params.id );
+
+    if ( !order ) {
+        return next( new ApiError( `order not found`, 404 ) );
+    }
+
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+
+    const updatedOrder = await order.save();
+
+    res.status( 200 ).json( {
+        status: 'success',
+        data: updatedOrder,
+    } );
+} );
 

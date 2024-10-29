@@ -14,7 +14,8 @@ const {
   filterOrderForLoggedUsers,
   getOrders,
   getOrder,
-  updateOrder,
+  updateOrderToPaid,
+  updateOrderToDelivered,
   deleteOrder,
 } = require( "../services/orderService" );
 
@@ -50,5 +51,18 @@ router
 //     deleteOrderValidator,
 //     deleteOrder,
 //   );
+
+router
+  .route( "/:id/pay" )
+  .put(
+    allowTo( "admin", "manager" ),
+    updateOrderToPaid,
+  )
+router
+  .route( "/:id/deliver" )
+  .put(
+    allowTo( "admin", "manager" ),
+    updateOrderToDelivered,
+  )
 
 module.exports = router;
