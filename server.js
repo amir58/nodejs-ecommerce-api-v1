@@ -2,6 +2,7 @@ const path = require( "path" );
 
 const express = require( "express" );
 const cors = require( "cors" );
+const compression = require( "compression" );
 const dotenv = require( "dotenv" );
 const morgan = require( "morgan" );
 
@@ -35,6 +36,8 @@ app.use( express.json() );
 
 app.use( cors() );
 app.options( "*", cors() )
+
+app.use( compression() );
 
 app.use( express.static( path.join( __dirname, "uploads" ) ) );
 
