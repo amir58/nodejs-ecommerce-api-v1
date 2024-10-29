@@ -1,3 +1,4 @@
+const stripe = require( "stripe" )( process.env.STRIPE_SECRET_KEY );
 const asyncHandler = require( "express-async-handler" );
 
 const ApiError = require( "../utils/apiError" );
@@ -128,3 +129,64 @@ exports.updateOrderToDelivered = asyncHandler( async ( req, res, next ) => {
     } );
 } );
 
+// @desc    Get checkout session from stripe and send it as response
+// @route   PUT /api/v1/orders/checkout
+// @access  Private/Protect/User
+exports.getCheckoutSession = asyncHandler( async ( req, res, next ) => {
+    const cart = await Cart.findOne( { user: req.user._id } );
+
+
+    if ( !cart ) {
+        return next( new ApiError( `Cart not found`, 404 ) );
+    }
+
+    const cartPrice = cart.totlaPriceAfterDiscount
+        ? cart.totlaPriceAfterDiscount
+        : cart.totalPrice;
+
+    // const session = await stripe.checkout.sessions.create( {
+    //     line_items: [
+    //         {
+    //             quantity: 1,
+    //             price_data: {
+    //                 currency: "EGP",
+    //                 unit_amount: cartPrice * 100,
+    //                 product_data: {
+    //                     name: cart.items[ 0 ].name
+    //                 },
+    //             },
+    //         },
+    //     ],
+    //     mode: 'payment',
+    //     success_url: `${ process.env.BASE_URL }/success.html`,
+    //     cancel_url: `${ process.env.BASE_URL }/cancel.html`,
+    //     customer_email: req.user.email,
+    //     client_reference_id: cart._id,
+    //     metadata: req.body.shippingAddress,
+    // } );
+    const session = await stripe.checkout.sessions.create( {
+        line_items: [
+            {
+                price_data: {
+                    currency: "AED",
+                    unit_amount: cartPrice * 100,
+                    product_data: { name: req.user.name },
+                },
+                quantity: 1,
+            },
+        ],
+        mode: "payment",
+        success_url: `${ req.protocol }://${ req.get( "host" ) }/orders`, ///req.protocol: http or https, req.get('host):
+        cancel_url: `${ req.protocol }://${ req.get( "host" ) }/cart`,
+        customer_email: req.user.email,
+        client_reference_id: cart._id,
+        metadata: req.body.shippingAddress,
+    } );
+
+
+    res.status( 200 ).json( {
+        status: 'success',
+        url: session.url
+    } );
+
+} );

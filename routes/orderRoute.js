@@ -11,6 +11,7 @@ const {
 
 const {
   createOrder,
+  getCheckoutSession,
   filterOrderForLoggedUsers,
   getOrders,
   getOrder,
@@ -58,11 +59,19 @@ router
     allowTo( "admin", "manager" ),
     updateOrderToPaid,
   )
+
 router
   .route( "/:id/deliver" )
   .put(
     allowTo( "admin", "manager" ),
     updateOrderToDelivered,
+  )
+
+router
+  .route( "/checkout" )
+  .post(
+    allowTo( "user" ),
+    getCheckoutSession,
   )
 
 module.exports = router;
