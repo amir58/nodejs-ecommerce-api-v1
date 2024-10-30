@@ -195,11 +195,12 @@ exports.getCheckoutSession = asyncHandler( async ( req, res, next ) => {
 const createCartOrder = async ( session ) => {
     const cartId = session.client_reference_id;
     const shippingAddress = session.metadata;
-    const orderPrice = session.display_items[ 0 ].unit_amount / 100;
 
     const cart = await Cart.findById( cartId );
     // const user = await User.findById( cart.user );
     const user = await User.findOne( { email: session.customer_email } );
+    
+    const orderPrice = cart.totalPrice;
 
     // Create order
     const order = await Order.create( {
