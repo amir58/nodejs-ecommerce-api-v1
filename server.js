@@ -39,7 +39,10 @@ app.post(
 );
 
 // Middleware
-app.use( express.json() );
+app.use( express.json( { 
+  // Set request size limit (security measure)
+  limit: '50kb' 
+} ) );
 
 app.use( cors() );
 app.options( "*", cors() )
