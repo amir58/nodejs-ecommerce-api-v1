@@ -6,6 +6,8 @@ const compression = require( "compression" );
 const dotenv = require( "dotenv" );
 const morgan = require( "morgan" );
 const rateLimit = require( "express-rate-limit" );
+const hpp = require( 'hpp' );
+
 
 dotenv.config( { path: "config.env" } );
 
@@ -70,6 +72,9 @@ const limiter = rateLimit( {
 
 // Apply the rate limiting middleware to all requests.
 app.use( "/api", limiter )
+
+// Prevent HTTP Parameter pollution ( Security measure )
+app.use( hpp( { whitelist: [ 'price', 'sold', 'quantity', 'ratingsAverage', 'ratingsQuantity' ] } ) );
 
 // Routes
 app.get( "/", ( req, res ) => { res.send( "Our, API V1 ✅" ); } );
