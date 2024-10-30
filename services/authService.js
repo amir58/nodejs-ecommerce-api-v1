@@ -5,6 +5,7 @@ const crypto = require( 'crypto' );
 const sendEmail = require( '../utils/sendEmail' );
 const ApiError = require( '../utils/apiError' );
 const User = require( '../models/userModel' );
+const { sanitizeUser } = require( '../utils/sanitizeData' );
 
 // @desc    Signup 
 // @route   POST  /api/v1/auth/signup
@@ -57,7 +58,7 @@ exports.login = asyncHandler( async ( req, res, next ) => {
     );
 
     res.status( 200 ).json( {
-        data: user,
+        data: sanitizeUser( user ),
         token: token,
     } );
 
