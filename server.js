@@ -32,6 +32,12 @@ dbConnection();
 // Express App
 const app = express();
 
+app.post(
+  "/webhook-checkout",
+  express.raw( { type: "application/json" } ),
+  webhookCheckout
+);
+
 // Middleware
 app.use( express.json() );
 
@@ -40,11 +46,7 @@ app.options( "*", cors() )
 
 app.use( compression() );
 
-app.post(
-  "/webhook-checkout",
-  express.raw( { type: "application/json" } ),
-  webhookCheckout
-);
+
 
 app.use( express.static( path.join( __dirname, "uploads" ) ) );
 

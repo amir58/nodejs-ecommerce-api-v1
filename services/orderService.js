@@ -5,6 +5,7 @@ const ApiError = require( "../utils/apiError" );
 const Order = require( "../models/orderModel" );
 const Cart = require( "../models/cartModel" );
 const Product = require( "../models/productModel" );
+const User = require( "../models/userModel" );
 const factory = require( "./handlersFactory" );
 
 
@@ -191,6 +192,45 @@ exports.getCheckoutSession = asyncHandler( async ( req, res, next ) => {
 
 } );
 
+
+const createCartOrder = async ( session ) => {
+    const cartId = session.client_reference_id;
+    const shippingAddress = session.metadata;
+    const orderPrice = session.display_items[ 0 ].unit_amount / 100;
+
+    const cart = await Cart.findById( cartId );
+    // const user = await User.findById( cart.user );
+    const user = await User.findOne( { email: session.customer_email } );
+
+    // Create order
+    const order = await Order.create( {
+        user: user._id,
+        cartItems: cart.items,
+        shippingAddress: shippingAddress,
+        totalPrice: orderPrice,
+        paymentMethod: "card",
+        isPaid: true,
+        paidAt: Date.now(),
+    } );
+
+    // Decrease product quantity, increase product sold
+    if ( order ) {
+        const bulkOptions = cart.items.map( item => ( {
+            updateOne: {
+                filter: { _id: item.product },
+                update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+            },
+        } ) );
+
+        await Product.bulkWrite( bulkOptions );
+
+        // Clear cart
+        await Cart.findOneAndUpdate( { _id: cartId }, { $set: { items: [], } } );
+
+        return order;
+    }
+}
+
 // @desc    Weebhook checkout
 // @route   PUT /webhooks-checkout
 // @access  Private/Protect/User
@@ -208,6 +248,7 @@ exports.webhookCheckout = asyncHandler( async ( req, res, next ) => {
         );
     } catch ( err ) {
         console.log( `Webhook error: ${ err.message }` );
+        return res.status( 400 ).send( `Webhook Error: ${ err.message }` );
     }
 
     console.log( `Event type: ${ event.type }` );
@@ -215,6 +256,8 @@ exports.webhookCheckout = asyncHandler( async ( req, res, next ) => {
     if ( event.type === "checkout.session.completed" ) {
         console.log( 'Create Order Here.......' );
         console.log( event.data.object.client_reference_id );
+        const order = await createCartOrder( event.data.object );
+        res.status( 200 ).json( { order } );
     }
 
 } );
