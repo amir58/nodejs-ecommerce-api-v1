@@ -5,6 +5,7 @@ const cors = require( "cors" );
 const compression = require( "compression" );
 const dotenv = require( "dotenv" );
 const morgan = require( "morgan" );
+const rateLimit = require( "express-rate-limit" );
 
 dotenv.config( { path: "config.env" } );
 
@@ -39,9 +40,9 @@ app.post(
 );
 
 // Middleware
-app.use( express.json( { 
+app.use( express.json( {
   // Set request size limit (security measure)
-  limit: '50kb' 
+  limit: '50kb'
 } ) );
 
 app.use( cors() );
@@ -56,6 +57,19 @@ app.use( express.static( path.join( __dirname, "uploads" ) ) );
 if ( process.env.MODE_ENV === "development" ) {
   app.use( morgan( "dev" ) );
 }
+
+// Rate limiting : Brute Force Attack ( Security Measure )
+const limiter = rateLimit( {
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  message: "Too many requests from this IP, please try again in an hour!",
+  standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+  // store: ... , // Redis, Memcached, etc. See below.
+} )
+
+// Apply the rate limiting middleware to all requests.
+app.use( "/api", limiter )
 
 // Routes
 app.get( "/", ( req, res ) => { res.send( "Our, API V1 ✅" ); } );
