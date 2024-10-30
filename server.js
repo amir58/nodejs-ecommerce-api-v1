@@ -7,6 +7,8 @@ const dotenv = require( "dotenv" );
 const morgan = require( "morgan" );
 const rateLimit = require( "express-rate-limit" );
 const hpp = require( 'hpp' );
+const mongoSanitize = require( 'express-mongo-sanitize' );
+
 
 
 dotenv.config( { path: "config.env" } );
@@ -75,6 +77,9 @@ app.use( "/api", limiter )
 
 // Prevent HTTP Parameter pollution ( Security measure )
 app.use( hpp( { whitelist: [ 'price', 'sold', 'quantity', 'ratingsAverage', 'ratingsQuantity' ] } ) );
+
+// Sanitize data : NoSQL Query Injection '$' ( Security measure )
+app.use( mongoSanitize() );
 
 // Routes
 app.get( "/", ( req, res ) => { res.send( "Our, API V1 ✅" ); } );
