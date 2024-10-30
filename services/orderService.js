@@ -190,3 +190,22 @@ exports.getCheckoutSession = asyncHandler( async ( req, res, next ) => {
     } );
 
 } );
+
+// @desc    Weebhook checkout
+// @route   PUT /webhooks-checkout
+// @access  Private/Protect/User
+exports.webhookCheckout = asyncHandler( async ( req, res, next ) => {
+    const signature = req.headers[ "stripe-signature" ];
+    let event;
+
+    try {
+        event = stripe.webhooks.constructEvent( req.body, signature, process.env.STRIPE_WEBHOOKS_SECRET );
+    } catch ( err ) {
+        return res.status( 400 ).send( `Webhook error: ${ err.message }` );
+    }
+
+    if ( event.type === "checkout.session.completed" ) {
+        console.log( 'Create Order Here.......' );
+    }
+
+} );
