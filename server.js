@@ -10,11 +10,10 @@ const hpp = require( 'hpp' );
 const mongoSanitize = require( 'express-mongo-sanitize' );
 const xss = require( 'xss-clean' );
 const session = require( 'express-session' );
-
+const helmet = require( "helmet" );
 
 dotenv.config( { path: "config.env" } );
 
-const { env } = require( "process" );
 const ApiError = require( "./utils/apiError" );
 const globalError = require( "./middlewares/errorMiddleware" );
 const dbConnection = require( "./config/database" );
@@ -98,6 +97,9 @@ if ( process.env.MODE_ENV === 'production' ) {
 }
 
 app.use( session( sess ) )
+
+// Server Security => Use appropriate security headers ( Security measure )
+app.use( helmet() );
 
 
 // Routes
