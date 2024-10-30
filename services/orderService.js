@@ -195,6 +195,7 @@ exports.getCheckoutSession = asyncHandler( async ( req, res, next ) => {
 // @route   PUT /webhooks-checkout
 // @access  Private/Protect/User
 exports.webhookCheckout = asyncHandler( async ( req, res, next ) => {
+    console.log( "Webhook checkout" );
     const signature = req.headers[ "stripe-signature" ];
     let event;
 
@@ -203,6 +204,8 @@ exports.webhookCheckout = asyncHandler( async ( req, res, next ) => {
     } catch ( err ) {
         return res.status( 400 ).send( `Webhook error: ${ err.message }` );
     }
+
+    console.log( `Event type: ${ event }` );
 
     if ( event.type === "checkout.session.completed" ) {
         console.log( 'Create Order Here.......' );
