@@ -9,9 +9,12 @@ const rateLimit = require( "express-rate-limit" );
 const hpp = require( 'hpp' );
 const mongoSanitize = require( 'express-mongo-sanitize' );
 const xss = require( 'xss-clean' );
+const session = require( 'express-session' );
+
 
 dotenv.config( { path: "config.env" } );
 
+const { env } = require( "process" );
 const ApiError = require( "./utils/apiError" );
 const globalError = require( "./middlewares/errorMiddleware" );
 const dbConnection = require( "./config/database" );
@@ -28,7 +31,7 @@ const addressRoute = require( "./routes/addressRoute" );
 const couponRoute = require( "./routes/couponRoute" );
 const cartRoute = require( "./routes/cartRoute" );
 const orderRoute = require( "./routes/orderRoute" );
-const { webhookCheckout } = require( "./services/orderService" )
+const { webhookCheckout } = require( "./services/orderService" );
 
 // Connect with DB
 dbConnection();
@@ -82,6 +85,20 @@ app.use( mongoSanitize() );
 
 // Data Sanitization : XSS Attack 'Scripts' ( Security measure )
 app.use( xss() );
+
+// Server Security => Set cookie flags appropriately ( Security measure )
+const sess = {
+  secret: 'a-m-e-shop',
+  cookie: { secure: true, httpOnly: true, path: '/user', sameSite: true }
+}
+
+if ( process.env.MODE_ENV === 'production' ) {
+  app.set( 'trust proxy', 1 ) // trust first proxy
+  sess.cookie.secure = true // serve secure cookies
+}
+
+app.use( session( sess ) )
+
 
 // Routes
 app.get( "/", ( req, res ) => { res.send( "Our, API V1 ✅" ); } );
