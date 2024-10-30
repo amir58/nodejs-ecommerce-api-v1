@@ -8,8 +8,7 @@ const morgan = require( "morgan" );
 const rateLimit = require( "express-rate-limit" );
 const hpp = require( 'hpp' );
 const mongoSanitize = require( 'express-mongo-sanitize' );
-
-
+const xss = require( 'xss-clean' );
 
 dotenv.config( { path: "config.env" } );
 
@@ -80,6 +79,9 @@ app.use( hpp( { whitelist: [ 'price', 'sold', 'quantity', 'ratingsAverage', 'rat
 
 // Sanitize data : NoSQL Query Injection '$' ( Security measure )
 app.use( mongoSanitize() );
+
+// Data Sanitization : XSS Attack 'Scripts' ( Security measure )
+app.use( xss() );
 
 // Routes
 app.get( "/", ( req, res ) => { res.send( "Our, API V1 ✅" ); } );
