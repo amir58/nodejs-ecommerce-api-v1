@@ -18,6 +18,8 @@ const ApiError = require( "./utils/apiError" );
 const globalError = require( "./middlewares/errorMiddleware" );
 const dbConnection = require( "./config/database" );
 // Routes
+const { validateApiKey } = require( "./services/apiKeyService" );
+const apiKeyRoute = require( "./routes/apiKeyRoute" );
 const categoryRoute = require( "./routes/categoryRoute" );
 const subCategoryRoute = require( "./routes/subCategoryRoute" );
 const brandRoute = require( "./routes/brandRoute" );
@@ -105,6 +107,9 @@ app.use( helmet() );
 // Routes
 app.get( "/", ( req, res ) => { res.send( "Our, API V1 ✅" ); } );
 app.get( "/ping", ( req, res ) => { res.send( "🚀" ); } );
+
+app.use( validateApiKey );
+app.use( "/api/v1/apiKeys", apiKeyRoute );
 app.use( "/api/v1/categories", categoryRoute );
 app.use( "/api/v1/subCategories", subCategoryRoute );
 app.use( "/api/v1/brands", brandRoute );
